@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Data: raw downloads and the full warehouse stay local
+data/raw/*
+!data/raw/.gitkeep
+data/*.duckdb
+data/*.duckdb.wal
+!data/sample/*.duckdb
+
+# Model artifacts are rebuilt by models/valuation/train.py
+models/artifacts/*
+!models/artifacts/.gitkeep
+
+# Agent checkpoints and eval scratch
+*.sqlite
+evals/results/tmp/
