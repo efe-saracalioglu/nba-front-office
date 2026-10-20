@@ -8,7 +8,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from evals.llm import chat
+from agents.providers import chat
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "nba_bench" / "trades.jsonl"

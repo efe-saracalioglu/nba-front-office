@@ -23,6 +23,8 @@ dependencies = [
     "matplotlib>=3.11.2",
     "mcp[cli]>=2.3.0",
     "feedparser>=6.0.14",
+    "langgraph>=1.2.16",
+    "langgraph-checkpoint-sqlite>=3.1.2",
 ]
 
 [dependency-groups]
@@ -56,9 +58,10 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 "evals/**" = ["E501"]  # prompts and case fixtures
 "models/**" = ["E501"]  # SQL and feature labels
 "mcp_server/**" = ["E501"]  # tool descriptions read by LLMs
+"agents/**" = ["E501"]  # prompts and fact sheets
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "rules/tests", "models/tests", "mcp_server/tests"]
+testpaths = ["tests", "rules/tests", "models/tests", "mcp_server/tests", "agents/tests"]
 markers = [
     "integration: needs network or the full warehouse",
 ]

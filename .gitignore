@@ -24,3 +24,6 @@ public-apis-master/
 # Generated report pages
 reports/*.html
 !reports/data_overview_template.html
+
+# Agent runs and checkpoints
+runs/
