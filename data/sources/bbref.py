@@ -1,10 +1,3 @@
-"""Basketball-Reference pages: season advanced stats and the league contracts table.
-
-Only a handful of pages are fetched (one per season plus one for contracts), with a
-pause between requests to stay well under the site's published rate limit. Raw HTML
-is cached under data/raw/bbref/ so parsing can be re-run offline.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -55,7 +48,6 @@ def _find_table(html: str, table_id: str):
     soup = BeautifulSoup(html, "lxml")
     table = soup.find("table", id=table_id)
     if table is None:
-        # Secondary tables are sometimes shipped inside HTML comments.
         for c in soup.find_all(string=lambda s: isinstance(s, Comment) and table_id in s):
             table = BeautifulSoup(c, "lxml").find("table", id=table_id)
             if table is not None:
@@ -66,7 +58,6 @@ def _find_table(html: str, table_id: str):
 
 
 def parse_table(html: str, table_id: str) -> list[dict]:
-    """Rows as {data-stat: cell}; each cell is (text, csk, classes). Header repeats are skipped."""
     rows = []
     for tr in _find_table(html, table_id).tbody.find_all("tr"):
         if "thead" in (tr.get("class") or []):
@@ -100,20 +91,17 @@ ADVANCED_STATS = {
     "ows": "ows", "dws": "dws", "ws": "ws", "ws_per_48": "ws_per_48",
     "obpm": "obpm", "dbpm": "dbpm", "bpm": "bpm", "vorp": "vorp",
 }  # fmt: skip
-# BBRef displays these as 0-100 but sorts by a 0-1 csk. The warehouse stores every
-# percentage as a 0-1 fraction (matching NBA.com), so fall back to text/100 without a csk.
 _PCT_SCALED = {
     "orb_pct", "drb_pct", "trb_pct", "ast_pct", "stl_pct", "blk_pct", "tov_pct", "usg_pct"
 }  # fmt: skip
 
 
 def parse_advanced(html: str, season: str) -> pd.DataFrame:
-    """One row per player-season. Traded players keep only the combined ('2TM'/'TOT') row."""
     out = []
     for r in parse_table(html, "advanced"):
         name_cell = r.get("name_display") or r.get("player")
         if name_cell is None or not name_cell.get("data-append-csv"):
-            continue  # league-average footer row
+            continue
         team_cell = r.get("team_name_abbr") or r.get("team_id")
         rec = {
             "bbref_id": name_cell["data-append-csv"],
@@ -130,7 +118,6 @@ def parse_advanced(html: str, season: str) -> pd.DataFrame:
             rec[col] = value
         out.append(rec)
     df = pd.DataFrame(out)
-    # BBRef lists the combined row first for multi-team players.
     df = df.drop_duplicates(subset=["bbref_id"], keep="first").drop(columns="team")
     for col in ("age", "g", "gs", "mp"):
         df[col] = df[col].astype("Int64")
@@ -144,7 +131,6 @@ def fetch_advanced(season: str, refresh: bool = False) -> pd.DataFrame:
 
 
 def parse_contracts(html: str, snapshot: date) -> pd.DataFrame:
-    """Long format: one row per (player, season) with salary and option type."""
     table = _find_table(html, "player-contracts")
     year_cols = {
         th["data-stat"]: th.get_text(strip=True)
@@ -177,7 +163,6 @@ def parse_contracts(html: str, snapshot: date) -> pd.DataFrame:
                 }
             )
     df = pd.DataFrame(out)
-    # A player waived and re-signed shows up twice; keep the larger (active) salary row.
     return (
         df.sort_values("salary", ascending=False)
         .drop_duplicates(subset=["bbref_id", "season"], keep="first")

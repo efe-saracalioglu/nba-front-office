@@ -1,9 +1,3 @@
-"""NBA.com stats via nba_api, cached to parquet under data/raw/nba_api/.
-
-Every fetch is cached by (endpoint, args) so re-running the ETL never re-hits the API
-unless `refresh=True`. Completed seasons never change, so the cache is the source of truth.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -48,7 +42,6 @@ def _cached(key: str, factory: Callable[[], object], refresh: bool) -> pd.DataFr
 
 
 def player_stats(season: str, measure: str, refresh: bool = False) -> pd.DataFrame:
-    """measure: 'Base' (totals) or 'Advanced'."""
     return _cached(
         f"player_stats_{measure.lower()}_{season}",
         lambda: leaguedashplayerstats.LeagueDashPlayerStats(

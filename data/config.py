@@ -1,5 +1,3 @@
-"""Paths, season ranges and team reference data shared by the ETL."""
-
 from __future__ import annotations
 
 import os
@@ -11,7 +9,6 @@ RAW_DIR = DATA_DIR / "raw"
 SAMPLE_DB = DATA_DIR / "sample" / "warehouse_sample.duckdb"
 SCHEMA_SQL = DATA_DIR / "schema.sql"
 
-# Stats history used for the valuation model; contracts/rosters are for CURRENT_SEASON.
 FIRST_SEASON = "2010-11"
 LAST_COMPLETED_SEASON = "2025-26"
 CURRENT_SEASON = "2026-27"
@@ -22,12 +19,10 @@ def default_db_path() -> Path:
 
 
 def season_label(end_year: int) -> str:
-    """2025 -> '2024-25'."""
     return f"{end_year - 1}-{str(end_year)[-2:]}"
 
 
 def season_end_year(label: str) -> int:
-    """'2024-25' -> 2025."""
     return int(label[:4]) + 1
 
 
@@ -35,7 +30,6 @@ def season_range(first: str, last: str) -> list[str]:
     return [season_label(y) for y in range(season_end_year(first), season_end_year(last) + 1)]
 
 
-# (nba abbreviation, basketball-reference abbreviation, conference, division)
 TEAMS: dict[int, tuple[str, str, str, str]] = {
     1610612737: ("ATL", "ATL", "East", "Southeast"),
     1610612738: ("BOS", "BOS", "East", "Atlantic"),

@@ -21,10 +21,6 @@ def create_schema(con: duckdb.DuckDBPyConnection) -> None:
 def replace_rows(
     con: duckdb.DuckDBPyConnection, table: str, df, where: str | None = None, source: str = ""
 ) -> int:
-    """Idempotent load: delete the slice described by `where` (or the whole table), then insert.
-
-    Columns are matched by name, so `df` may hold them in any order but must not hold extras.
-    """
     con.register("_incoming", df)
     try:
         con.execute("BEGIN")

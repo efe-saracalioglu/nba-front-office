@@ -1,11 +1,3 @@
-"""Cut a small warehouse for CI, tests and the hosted demo.
-
-    python -m data.make_sample [--seasons 3] [--game-log-seasons 1]
-
-Keeps the last N seasons of stats, the last M seasons of game logs, and all
-current-season tables (rosters, contracts, draft picks).
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -38,13 +30,17 @@ def make_sample(src: Path, dst: Path, n_seasons: int, n_log_seasons: int) -> Non
     if keep_logs:
         con.execute(f"INSERT INTO player_game_logs SELECT * FROM src.player_game_logs "
                     f"WHERE season IN ({keep_logs})")  # fmt: skip
+        con.execute(f"""INSERT INTO pbp_events SELECT * FROM src.pbp_events WHERE game_id IN (
+            SELECT DISTINCT game_id FROM src.player_game_logs WHERE season = '{seasons[0]}'
+              AND game_date < (SELECT min(game_date) + 30 FROM src.player_game_logs
+                               WHERE season = '{seasons[0]}'))""")
     con.execute("DETACH src")
     con.execute("CHECKPOINT")
     con.close()
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description="Cut a small sample warehouse")
     parser.add_argument("--src", type=Path, default=config.default_db_path())
     parser.add_argument("--dst", type=Path, default=config.SAMPLE_DB)
     parser.add_argument("--seasons", type=int, default=3)

@@ -84,6 +84,34 @@ CREATE TABLE IF NOT EXISTS player_game_logs (
     PRIMARY KEY (game_id, player_id)
 );
 
+-- Regular-season play-by-play (NBA.com PlayByPlayV3 schema), one row per event.
+-- Order events with event_index; action_number is the feed's id and is NOT chronological.
+CREATE TABLE IF NOT EXISTS pbp_events (
+    game_id           VARCHAR NOT NULL,   -- joins player_game_logs.game_id
+    season            VARCHAR NOT NULL,
+    event_index       INTEGER NOT NULL,   -- 0-based chronological order within the game
+    action_number     INTEGER NOT NULL,   -- feed id; steals/blocks share it with their parent event
+    is_secondary      BOOLEAN NOT NULL,   -- TRUE for steals/blocks attached to a turnover/miss
+    period            INTEGER NOT NULL,   -- 1-4, 5+ = overtime
+    clock_seconds     DOUBLE,             -- seconds remaining in the period
+    team_id           BIGINT,
+    player_id         BIGINT,
+    player_name       VARCHAR,            -- last name as shown in the feed
+    action_type       VARCHAR NOT NULL,   -- 'Made Shot' | 'Missed Shot' | 'Free Throw' | 'Rebound' | 'Turnover' | 'Steal' | 'Block' | 'Foul' | 'Substitution' | ...
+    sub_type          VARCHAR,            -- e.g. 'Cutting Layup Shot', 'Offensive'
+    description       VARCHAR,
+    shot_result       VARCHAR,            -- 'Made' | 'Missed' for field goals
+    is_field_goal     BOOLEAN NOT NULL,
+    shot_value        INTEGER,            -- 2 or 3 for field goals, else 0
+    shot_distance     INTEGER,            -- feet
+    x INTEGER, y INTEGER,                 -- shot location, legacy court coordinates
+    location          VARCHAR,            -- 'h' home | 'v' visitor
+    score_home        INTEGER,            -- score after this event, only on scoring rows
+    score_away        INTEGER,
+    points            INTEGER NOT NULL,   -- points scored on this event (0 for non-scoring)
+    PRIMARY KEY (game_id, event_index)
+);
+
 CREATE TABLE IF NOT EXISTS team_season_stats (
     team_id           BIGINT NOT NULL,
     season            VARCHAR NOT NULL,
@@ -121,16 +149,21 @@ CREATE TABLE IF NOT EXISTS contracts (
     PRIMARY KEY (bbref_id, season)
 );
 
--- Future draft pick ownership (curated seed file; see data/seed/README.md).
+-- Future draft pick ownership, rebuilt by replaying pick trades since 2019-20
+-- (python -m data.draft_picks; see data/seed/pick_overrides.yaml for manual resolutions).
+-- One row per asset. A team still holding its own pick has kind = 'own'.
 CREATE TABLE IF NOT EXISTS draft_picks (
-    year              INTEGER NOT NULL,
-    round             INTEGER NOT NULL,   -- 1 or 2
-    original_team_id  BIGINT NOT NULL,
+    asset_id          VARCHAR PRIMARY KEY, -- '2029-1-PHO' for plain picks
+    year              INTEGER NOT NULL,    -- draft year
+    round             INTEGER NOT NULL,    -- 1 or 2
     owner_team_id     BIGINT NOT NULL,
-    protection        VARCHAR,            -- free text, e.g. 'top-4 protected'
-    is_swap           BOOLEAN DEFAULT FALSE,
-    notes             VARCHAR,
-    PRIMARY KEY (year, round, original_team_id, owner_team_id)
+    original_team_id  BIGINT,              -- NULL when the asset depends on several teams' picks
+    original_teams    VARCHAR NOT NULL,    -- comma-separated NBA abbreviations, e.g. 'MIN,UTA'
+    kind              VARCHAR NOT NULL,    -- 'own' | 'acquired' | 'swap_right' | 'conditional'
+    description       VARCHAR,             -- e.g. 'more favorable of MIN and UTA'
+    protection        VARCHAR,             -- e.g. 'top-4 protected'
+    last_trade        VARCHAR,             -- trade_key of the latest transfer
+    inferred          BOOLEAN NOT NULL     -- TRUE when a transfer had no annotation and was inferred
 );
 
 -- Populated by the Scout news pipeline (Phase 4).

@@ -1,12 +1,3 @@
-"""Build the DuckDB warehouse from NBA.com + Basketball-Reference.
-
-    python -m data.build_warehouse                       # full history, cached fetches
-    python -m data.build_warehouse --seasons 2023-24:2025-26 --skip-game-logs
-    python -m data.build_warehouse --refresh-current     # re-pull rosters and contracts
-
-Every step is idempotent: each slice is deleted and re-inserted.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -18,7 +9,7 @@ from nba_api.stats.static import teams as static_teams
 
 from data import config, db, quality
 from data.crosswalk import build_crosswalk, match_by_name
-from data.sources import bbref, nba_stats
+from data.sources import bbref, nba_stats, pbp_archive
 
 log = logging.getLogger("etl")
 
@@ -87,7 +78,6 @@ def season_game_logs(season: str, refresh: bool) -> pd.DataFrame:
 def current_rosters(season: str, refresh: bool) -> pd.DataFrame:
     frames = [nba_stats.team_roster(tid, season, refresh) for tid in config.TEAMS]
     df = pd.concat(frames, ignore_index=True)
-    # NBA.com flags two-way players with SUPPLEMENTAL_STATUS = 1.
     two_way = pd.to_numeric(df.get("SUPPLEMENTAL_STATUS"), errors="coerce").fillna(0) == 1
     return pd.DataFrame(
         {
@@ -142,7 +132,6 @@ def build_contracts(raw: pd.DataFrame, xwalk: pd.DataFrame, rosters, players) ->
     df = raw.merge(xwalk[["bbref_id", "player_id"]], on="bbref_id", how="left")
     missing = df[df.player_id.isna()]
     if len(missing):
-        # Rookies and returning players have no stats row yet; fall back to names.
         pool = pd.concat(
             [rosters[["player_id", "player_name"]], players[["player_id", "player_name"]]]
         )
@@ -151,6 +140,25 @@ def build_contracts(raw: pd.DataFrame, xwalk: pd.DataFrame, rosters, players) ->
     df["team_id"] = df["bbref_team"].map(config.BBREF_TO_TEAM_ID)
     df["player_id"] = df["player_id"].astype("Int64")
     return df.drop(columns="bbref_team")
+
+
+def load_pbp(con, season: str) -> None:
+    pbp = pbp_archive.load_season(season)
+    box_games = {
+        r[0]
+        for r in con.execute(
+            "SELECT DISTINCT game_id FROM player_game_logs WHERE season = ?", [season]
+        ).fetchall()
+    }
+    missing = sorted(box_games - set(pbp["game_id"]))
+    if missing:
+        log.info(
+            "pbp %s: %d games missing from archive, fetching from NBA.com", season, len(missing)
+        )
+        pbp = pd.concat([pbp, pbp_archive.fetch_games(missing, season)], ignore_index=True)
+    db.replace_rows(
+        con, "pbp_events", pbp, f"season = '{season}'", "shufinskiy/nba_data nbastatsv3 + nba_api"
+    )
 
 
 def load_draft_picks(con, seed: Path) -> None:
@@ -164,20 +172,17 @@ def build(
     db_path: Path,
     seasons: list[str],
     skip_game_logs: bool = False,
+    skip_pbp: bool = False,
     refresh_current: bool = False,
 ) -> None:
     con = db.connect(db_path)
     db.create_schema(con)
     load_teams(con)
 
-    stats, bios, advanced = [], [], []
     for season in seasons:
         log.info("season %s", season)
         s = season_player_stats(season, refresh=False)
         db.replace_rows(con, "player_season_stats", s, f"season = '{season}'", "nba_api")
-        stats.append(s)
-        bios.append(nba_stats.player_bio(season).assign(season=season))
-        advanced.append(bbref.fetch_advanced(season))
         db.replace_rows(
             con, "team_season_stats", season_team_stats(season, False), f"season = '{season}'"
         )
@@ -185,21 +190,26 @@ def build(
             db.replace_rows(
                 con, "player_game_logs", season_game_logs(season, False), f"season = '{season}'"
             )
+        if not skip_pbp:
+            load_pbp(con, season)
 
-    stats_df = pd.concat(stats, ignore_index=True)
-    adv_df = pd.concat(advanced, ignore_index=True)
+    all_seasons = [
+        r[0]
+        for r in con.execute(
+            "SELECT DISTINCT season FROM player_season_stats ORDER BY 1"
+        ).fetchall()
+    ]
+    stats_df = con.execute(
+        "SELECT player_id, player_name, season, gp, min FROM player_season_stats"
+    ).df()
+    bios = [nba_stats.player_bio(s).assign(season=s) for s in all_seasons]
+    adv_df = pd.concat([bbref.fetch_advanced(s) for s in all_seasons], ignore_index=True)
     xwalk = build_crosswalk(adv_df, stats_df)
     log.info("crosswalk: %s", xwalk.method.value_counts().to_dict())
 
     adv_matched = adv_df.merge(xwalk[["bbref_id", "player_id"]], on="bbref_id")
     adv_matched = adv_matched.drop_duplicates(subset=["player_id", "season"])
-    db.replace_rows(
-        con,
-        "player_season_advanced",
-        adv_matched,
-        "season IN ({})".format(", ".join(f"'{s}'" for s in seasons)),
-        "basketball-reference",
-    )
+    db.replace_rows(con, "player_season_advanced", adv_matched, source="basketball-reference")
 
     rosters = current_rosters(config.CURRENT_SEASON, refresh_current)
     db.replace_rows(con, "rosters", rosters, f"season = '{config.CURRENT_SEASON}'", "nba_api")
@@ -222,7 +232,7 @@ def build(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description="Build the DuckDB warehouse")
     parser.add_argument("--db", type=Path, default=config.default_db_path())
     parser.add_argument(
         "--seasons",
@@ -230,11 +240,18 @@ def main() -> None:
         help="first:last, e.g. 2015-16:2025-26",
     )
     parser.add_argument("--skip-game-logs", action="store_true")
+    parser.add_argument("--skip-pbp", action="store_true", help="skip play-by-play (~9M rows)")
     parser.add_argument("--refresh-current", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     first, last = args.seasons.split(":")
-    build(args.db, config.season_range(first, last), args.skip_game_logs, args.refresh_current)
+    build(
+        args.db,
+        config.season_range(first, last),
+        skip_game_logs=args.skip_game_logs,
+        skip_pbp=args.skip_pbp,
+        refresh_current=args.refresh_current,
+    )
 
 
 if __name__ == "__main__":

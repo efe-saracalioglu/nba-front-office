@@ -1,10 +1,7 @@
-"""Warehouse data-quality checks. Each check returns a message when it fails."""
-
 from __future__ import annotations
 
 import duckdb
 
-# (description, SQL returning a single number, predicate on that number)
 CHECKS: list[tuple[str, str, callable]] = [
     ("30 teams", "SELECT count(*) FROM teams", lambda n: n == 30),
     (
@@ -56,6 +53,19 @@ CHECKS: list[tuple[str, str, callable]] = [
         lambda n: n == 0,
     ),
     (
+        "draft picks: every team has one own-pick asset per draft and round",
+        """SELECT count(*) FROM (
+             SELECT original_team_id, year, round, count(*) n FROM draft_picks
+             WHERE kind IN ('own', 'acquired') AND original_team_id IS NOT NULL
+             GROUP BY ALL HAVING n <> 1)""",
+        lambda n: n == 0,
+    ),
+    (
+        "draft picks loaded (30 teams x 7 drafts x 2 rounds)",
+        "SELECT count(*) FROM draft_picks WHERE kind IN ('own', 'acquired')",
+        lambda n: n == 420,
+    ),
+    (
         "no negative salaries",
         "SELECT count(*) FROM contracts WHERE salary <= 0",
         lambda n: n == 0,
@@ -72,10 +82,38 @@ GAME_LOG_CHECK = (
 )
 
 
+PBP_CHECKS = [
+    (
+        "play-by-play points match box scores (>=99.5% of player-games)",
+        """WITH p AS (SELECT game_id, player_id, sum(points) pts FROM pbp_events GROUP BY ALL)
+           SELECT avg(CASE WHEN coalesce(p.pts, 0) = g.pts THEN 1 ELSE 0 END)
+           FROM player_game_logs g LEFT JOIN p USING (game_id, player_id)
+           WHERE g.game_id IN (SELECT DISTINCT game_id FROM pbp_events)""",
+        lambda r: r is not None and r >= 0.995,
+    ),
+    (
+        "every box-score game has play-by-play (up to the last date covered)",
+        """WITH g AS (SELECT DISTINCT game_id, season, game_date FROM player_game_logs),
+                covered AS (SELECT season, max(game_date) last_day FROM g
+                            WHERE game_id IN (SELECT game_id FROM pbp_events) GROUP BY 1)
+           SELECT count(*) FROM g JOIN covered USING (season)
+           WHERE g.game_date <= covered.last_day
+             AND g.game_id NOT IN (SELECT DISTINCT game_id FROM pbp_events)""",
+        lambda n: n == 0,
+    ),
+]
+
+
+def _has_rows(con, table: str) -> bool:
+    return con.execute(f"SELECT count(*) FROM {table}").fetchone()[0] > 0
+
+
 def run_checks(con: duckdb.DuckDBPyConnection) -> list[str]:
     checks = list(CHECKS)
-    if con.execute("SELECT count(*) FROM player_game_logs").fetchone()[0]:
+    if _has_rows(con, "player_game_logs"):
         checks.append(GAME_LOG_CHECK)
+        if _has_rows(con, "pbp_events"):
+            checks.extend(PBP_CHECKS)
     failures = []
     for desc, sql, ok in checks:
         value = con.execute(sql).fetchone()[0]

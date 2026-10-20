@@ -56,7 +56,6 @@ def test_name_match_carries_across_seasons():
 
 
 def test_same_name_same_season_is_not_guessed_by_name():
-    # Two different players share a name; statline must disambiguate.
     bbref = _bbref(
         [("willima01", "Marcus Williams", "2012-13", 5, 40),
          ("willima02", "Marcus Williams", "2012-13", 60, 1500)]

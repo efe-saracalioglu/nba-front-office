@@ -20,3 +20,6 @@ models/artifacts/*
 # Agent checkpoints and eval scratch
 *.sqlite
 evals/results/tmp/
+
+# Local reference copy, not part of the project
+public-apis-master/
