@@ -1,0 +1,41 @@
+season: "2026-27"
+sources:
+  - https://www.hoopsrumors.com/2026/06/salary-cap-tax-line-set-for-2026-27-nba-season.html
+  - https://www.yardbarker.com/nba/articles/nba_officially_sets_salary_cap_tax_aprons_for_2026_27_season/s1_17038_44013356
+  - https://www.yardbarker.com/nba/articles/2027_nba_trade_deadline_set_for_february_11/s1_14822_44140863
+  - https://www.dunkest.com/en/nba/news/244243/nba-schedule-opening-night-key-dates
+
+calendar:
+  league_year_start: 2026-07-01
+  league_year_end: 2027-06-30
+  regular_season_start: 2026-10-20
+  trade_deadline: 2027-02-11
+
+salary_cap: 164961000
+minimum_team_salary: 148465000
+luxury_tax: 200428000
+first_apron: 209015000
+second_apron: 221686000
+
+trade:
+  matching_cushion: 250000
+  matching_bracket: 9096000
+  apron_matching_pct: 1.00
+  cash_limit: 8495000
+  aggregation_wait_days: 60
+
+signing:
+  offseason_start: 2026-07-01
+  offseason_trade_date: 2026-12-15
+  wait_months: 3
+
+roster:
+  offseason_max_standard: 21
+  max_standard: 15
+  min_standard: 14
+  temporary_min_standard: 13
+  max_two_way: 3
+
+draft:
+  first_tradable_year: 2027
+  last_tradable_year: 2033

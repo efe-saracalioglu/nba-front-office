@@ -15,6 +15,7 @@ dependencies = [
     "tenacity>=9.0",
     "beautifulsoup4>=4.15.0",
     "lxml>=6.1.3",
+    "python-dotenv>=1.2.4",
 ]
 
 [dependency-groups]
@@ -40,6 +41,9 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E501"]  # inline HTML fixtures
+"reports/*" = ["E501"]  # page copy and labels
+"rules/**" = ["E501"]  # violation messages
+"evals/**" = ["E501"]  # prompts and case fixtures
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "rules/tests"]

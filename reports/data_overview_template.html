@@ -1,0 +1,640 @@
+<title>Front Office Veri Atlası</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+:root {
+  --bg: #f6f6f3;
+  --panel: #fcfcfb;
+  --ink: #16191d;
+  --ink-2: #4f5358;
+  --muted: #858981;
+  --grid: #e3e3dc;
+  --axis: #c4c4ba;
+  --line: rgba(20, 24, 28, 0.10);
+  --accent: #2a78d6;
+  --accent-soft: #e4effc;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --seq-0: #eef4fc; --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #6da7ec; --seq-4: #3987e5; --seq-5: #256abf; --seq-6: #184f95; --seq-7: #0d366b;
+  --court: #c9c9bf;
+  --good: #0ca30c; --good-ink: #006300;
+  --pick-own: #2a78d6; --pick-in: #1baf7a; --pick-extra: #6250d6;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111211; --panel: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
+    --grid: #2c2c2a; --axis: #3f3f3b; --line: rgba(255, 255, 255, 0.10);
+    --accent: #3987e5; --accent-soft: #1d2a3a;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --seq-0: #1e2733; --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #256abf; --seq-4: #2a78d6; --seq-5: #5598e7; --seq-6: #86b6ef; --seq-7: #cde2fb;
+    --court: #4a4a45; --good: #0ca30c; --good-ink: #2fbf2f;
+    --pick-own: #3987e5; --pick-in: #199e70; --pick-extra: #9085e9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111211; --panel: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
+  --grid: #2c2c2a; --axis: #3f3f3b; --line: rgba(255, 255, 255, 0.10);
+  --accent: #3987e5; --accent-soft: #1d2a3a;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --seq-0: #1e2733; --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #256abf; --seq-4: #2a78d6; --seq-5: #5598e7; --seq-6: #86b6ef; --seq-7: #cde2fb;
+  --court: #4a4a45; --good: #0ca30c; --good-ink: #2fbf2f;
+  --pick-own: #3987e5; --pick-in: #199e70; --pick-extra: #9085e9;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; margin: 0; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { padding-block: 40px 8px; }
+.eyebrow { font-family: var(--display); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-size: 14px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(36px, 6vw, 56px); line-height: 1; margin: 6px 0 12px; text-wrap: balance; letter-spacing: 0.01em; }
+.lede { color: var(--ink-2); max-width: 64ch; margin: 0; }
+nav.index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-top: 24px; }
+nav.index .wrap { display: flex; gap: 4px; overflow-x: auto; padding-block: 8px; scrollbar-width: none; }
+nav.index a { font-family: var(--display); font-weight: 600; font-size: 16px; letter-spacing: 0.03em; color: var(--ink-2); text-decoration: none; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+nav.index a:hover, nav.index a:focus-visible { background: var(--accent-soft); color: var(--ink); outline: none; }
+section { padding-block: 36px 8px; scroll-margin-top: 56px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.1; margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance; }
+.sub { color: var(--ink-2); margin: 0 0 18px; max-width: 70ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 28px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.tile .k { font-size: 13px; color: var(--muted); }
+.tile .v { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; }
+.tile .n { font-size: 13px; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); background: var(--panel); }
+.pill.ok { color: var(--good-ink); border-color: color-mix(in srgb, var(--good) 40%, transparent); }
+.pill.ok::before { content: "✓"; font-weight: 700; }
+.controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 14px; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13.5px; background: transparent; color: var(--ink-2); border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.seg button:focus-visible, .btn:focus-visible, .trow:focus-visible, th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { font: inherit; font-size: 13.5px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+label.inline { font-size: 13.5px; color: var(--ink-2); display: inline-flex; gap: 8px; align-items: center; }
+input[type="range"] { accent-color: var(--accent); width: min(320px, 60vw); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+svg text { font-family: var(--body); }
+.tick { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+.baseline { stroke: var(--axis); stroke-width: 1; }
+.lbl { font-size: 12px; fill: var(--ink-2); }
+.lbl-strong { font-size: 12px; fill: var(--ink); font-weight: 600; }
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); max-width: 280px; line-height: 1.45; }
+#tip b { font-weight: 600; }
+#tip .m { color: var(--muted); }
+.tlist { display: grid; gap: 2px; }
+.trow { display: grid; grid-template-columns: 190px minmax(0, 1fr) 110px; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; background: transparent; color: inherit; font: inherit; text-align: left; width: 100%; }
+.trow:hover { background: var(--accent-soft); }
+.trow[aria-expanded="true"] { background: var(--accent-soft); border-color: var(--line); }
+.trow .nm { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; }
+.trow .bar { height: 10px; border-radius: 0 4px 4px 0; background: var(--accent); min-width: 2px; }
+.trow .ct { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 13.5px; }
+@media (max-width: 560px) { .trow { grid-template-columns: 1fr 90px; } .trow .track { display: none; } }
+.detail { padding: 6px 10px 18px; display: grid; gap: 10px; }
+.detail p { margin: 0; color: var(--ink-2); max-width: 75ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line); color: var(--ink-2); }
+.chip i { font-style: normal; color: var(--muted); }
+.scroll { overflow-x: auto; }
+table.data { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.data th, table.data td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.data th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.data td.num, table.data th.num { text-align: right; }
+th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+th button[aria-sort] { color: var(--ink); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--ink-2); margin-bottom: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.sw.line { height: 3px; border-radius: 2px; width: 16px; }
+.court-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; }
+@media (max-width: 760px) { .court-wrap { grid-template-columns: minmax(0, 1fr); } }
+.court-side .big { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; }
+.zone-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) 48px; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+.zone-row .b { height: 8px; border-radius: 0 4px 4px 0; background: var(--accent); }
+.zone-row .p { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.picks-grid { display: grid; gap: 3px; font-variant-numeric: tabular-nums; }
+.pk-h { font-size: 11.5px; color: var(--muted); text-align: center; }
+.pk-t { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding-right: 6px; }
+.pk-t small { font-weight: 400; color: var(--muted); }
+.pk { position: relative; height: 26px; border-radius: 5px; border: 1.5px solid var(--axis); background: transparent; cursor: default; }
+.pk.own { background: var(--pick-own); border-color: var(--pick-own); }
+.pk.out { border-style: dashed; }
+.pk .badge { position: absolute; right: -4px; top: -6px; min-width: 18px; height: 16px; border-radius: 8px; padding: 0 4px; font-size: 10.5px; line-height: 16px; text-align: center; color: #fff; background: var(--pick-in); border: 2px solid var(--panel); font-weight: 700; }
+.pk .dot { position: absolute; left: 4px; bottom: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--pick-extra); box-shadow: 0 0 0 2px var(--panel); }
+.pk.own .dot { box-shadow: 0 0 0 2px var(--pick-own); }
+.pk .hatch { position: absolute; inset: 0; border-radius: 4px; background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--panel) 70%, transparent) 4px 6px); }
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--ink-2); }
+.checks li { display: flex; gap: 8px; }
+.checks li::before { content: "✓"; color: var(--good-ink); font-weight: 700; }
+.limits { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; display: grid; gap: 6px; max-width: 75ch; }
+footer { padding-block: 32px 48px; color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="top wrap">
+  <div class="eyebrow">NBA Front Office · Faz 1 veri ambarı</div>
+  <h1>Front Office Veri Atlası</h1>
+  <p class="lede" id="lede"></p>
+  <div class="tiles" id="tiles"></div>
+</header>
+
+<nav class="index" aria-label="Bölümler">
+  <div class="wrap">
+    <a href="#tablolar">Tablolar</a>
+    <a href="#lig">Lig nasıl değişti</a>
+    <a href="#sut">Şut haritası</a>
+    <a href="#deger">Oyuncu değeri</a>
+    <a href="#maas">Maaşlar</a>
+    <a href="#pick">Draft pick'leri</a>
+    <a href="#kalite">Veri kalitesi</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="tablolar">
+    <h2>Ambardaki tablolar</h2>
+    <p class="sub">Çubuk uzunluğu satır sayısını logaritmik ölçekte gösterir. Bir tabloya tıklayınca sütunları ve örnek satırları açılır.</p>
+    <div class="panel"><div class="tlist" id="tlist"></div></div>
+  </section>
+
+  <section id="lig">
+    <h2>Lig nasıl değişti</h2>
+    <p class="sub">2010-11'den bu yana oyunun kendisi değişti. Bu yüzden değerleme modeli istatistikleri sezona göre normalize edecek.</p>
+    <div class="two">
+      <div class="panel">
+        <div class="controls"><div class="seg" id="trend-seg" role="group" aria-label="Metrik"></div></div>
+        <div id="trend-chart"></div>
+      </div>
+      <div class="panel">
+        <div class="lbl-strong" style="font-size:14px;margin-bottom:4px">Şutlar nereden atılıyor</div>
+        <div class="legend" id="zone-legend"></div>
+        <div id="zone-chart"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sut">
+    <h2>Şut haritası</h2>
+    <p class="sub">Play-by-play'deki her isabetli ve isabetsiz şut, 2×2 feet'lik karelere bölündü. Renk o karenin sezonun tüm şutları içindeki payını gösterir. Kaydırıcıyla sezon seçebilir ya da oynatabilirsin.</p>
+    <div class="panel">
+      <div class="controls">
+        <button class="btn" id="play" type="button">▶ Oynat</button>
+        <label class="inline" for="season-range">Sezon <input type="range" id="season-range" min="0" max="15" step="1" value="15"> <b id="season-label"></b></label>
+        <div class="seg" id="shot-mode" role="group" aria-label="Gösterim">
+          <button type="button" data-mode="share" aria-pressed="true">Şut payı</button>
+          <button type="button" data-mode="fg" aria-pressed="false">İsabet %</button>
+        </div>
+      </div>
+      <div class="court-wrap">
+        <div id="court"></div>
+        <div class="court-side" id="court-side"></div>
+      </div>
+      <p class="note" id="court-note"></p>
+    </div>
+  </section>
+
+  <section id="deger">
+    <h2>Oyuncu değeri: Win Shares</h2>
+    <p class="sub">Faz 3'teki modelin tahmin edeceği hedef. Bir oyuncunun takımına kaç galibiyet kazandırdığını tahmin eden bir metrik. Grafik 500+ dakika oynamış oyuncu-sezonları gösteriyor.</p>
+    <div class="two">
+      <div class="panel">
+        <div class="tiles" id="ws-tiles" style="margin:0 0 14px"></div>
+        <div id="ws-hist"></div>
+      </div>
+      <div class="panel">
+        <div class="lbl-strong" style="font-size:14px;margin-bottom:8px">2025-26'nın en değerli 30 oyuncusu</div>
+        <div class="scroll" style="max-height:430px;overflow-y:auto"><table class="data" id="top-table"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="maas">
+    <h2>Maaşlar: 2026-27</h2>
+    <p class="sub">Takım başına toplam maaş. Waive edilmiş oyuncuların hâlâ ödenen maaşı da dahil. Bir takıma tıklayınca en büyük 5 kontratı açılır.</p>
+    <div class="panel">
+      <div class="controls">
+        <div class="seg" id="pay-seg" role="group" aria-label="Sezon">
+          <button type="button" data-k="y1" aria-pressed="true">2026-27</button>
+          <button type="button" data-k="y2" aria-pressed="false">2027-28 taahhütleri</button>
+        </div>
+      </div>
+      <div class="two">
+        <div id="pay-chart"></div>
+        <div id="pay-detail"></div>
+      </div>
+      <p class="note">Maaş tavanı ve apron çizgileri, 2026-27 resmi rakamları Faz 2'de doğrulandığında eklenecek.</p>
+    </div>
+  </section>
+
+  <section id="pick">
+    <h2>Draft pick haritası 2027–2033</h2>
+    <p class="sub">2019-20'den bu yana yapılan her pick takası sırayla deftere işlendi. Her satır bir takım, her sütun bir draft yılı.</p>
+    <div class="panel">
+      <div class="controls">
+        <div class="seg" id="round-seg" role="group" aria-label="Tur">
+          <button type="button" data-r="1" aria-pressed="true">1. tur</button>
+          <button type="button" data-r="2" aria-pressed="false">2. tur</button>
+        </div>
+        <div class="seg" id="sort-seg" role="group" aria-label="Sıralama">
+          <button type="button" data-s="total" aria-pressed="true">En çok pick</button>
+          <button type="button" data-s="alpha" aria-pressed="false">Alfabetik</button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--pick-own)"></i>Kendi pick'i elinde</span>
+        <span><i class="sw" style="border:1.5px dashed var(--axis)"></i>Kendi pick'ini devretmiş</span>
+        <span><i class="sw" style="background:var(--pick-in);border-radius:8px"></i>Başka takımdan gelen pick sayısı</span>
+        <span><i class="sw" style="background:var(--pick-extra);border-radius:50%"></i>Swap hakkı / koşullu pick tutuyor</span>
+        <span><i class="sw" style="background:repeating-linear-gradient(135deg, var(--pick-own) 0 3px, var(--panel) 3px 5px)"></i>Pick'i elinde ama başkasının swap hakkı var</span>
+      </div>
+      <div class="scroll"><div class="picks-grid" id="picks"></div></div>
+      <p class="note">Defterde inceleme bekleyen 29 kayıt var (çoğu 2. tur). Bkz. data/seed/pick_review.csv.</p>
+    </div>
+  </section>
+
+  <section id="kalite">
+    <h2>Veri kalitesi</h2>
+    <p class="sub">Play-by-play'den hesaplanan sayılar, oyuncu-maç bazında kutu skorlarıyla karşılaştırıldı. Eksik maçlar NBA.com API'sinden tamamlandı.</p>
+    <div class="two">
+      <div class="panel">
+        <div class="lbl-strong" style="font-size:14px;margin-bottom:4px">Sayı mutabakatı, sezon bazında (%)</div>
+        <div id="pbp-chart"></div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <span class="lbl-strong" style="font-size:14px">Otomatik kontroller</span>
+          <span class="pill ok" id="qpill"></span>
+        </div>
+        <ul class="checks" id="checks"></ul>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div class="lbl-strong" style="font-size:14px;margin-bottom:8px">Bilinen sınırlar</div>
+      <ul class="limits">
+        <li>Kontratlar bugünün anlık görüntüsü. Geçmiş sezonların maaşları yok.</li>
+        <li>Bonuslar ve garanti edilmemiş maaşlar ayrı tutulmuyor.</li>
+        <li>Pick defterinde 29 kayıt incelemede: 21 çakışma, 6 belirsiz transfer, 2 sahipsiz koruma notu.</li>
+        <li>Sakatlık tablosu boş. Faz 4'te Scout agent'ı dolduracak.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">Kaynaklar: NBA.com (nba_api), Basketball-Reference, shufinskiy/nba_data (Apache-2.0). Sayfa reports/data_overview.py ile ambardan üretildi.</footer>
+
+<div id="tip" hidden></div>
+
+<script>
+const D = /*__DATA__*/null;
+const fmt = (n, d = 0) => Number(n).toLocaleString("tr-TR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 1) => fmt(v * 100, d) + "%";
+const money = v => "$" + fmt(v / 1e6, 1) + "M";
+const NS = "http://www.w3.org/2000/svg";
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function h(tag, attrs = {}, html) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (html !== undefined) e.innerHTML = html;
+  return e;
+}
+const tip = document.getElementById("tip");
+function showTip(html, ev) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+}
+const hideTip = () => { tip.hidden = true; };
+function segment(container, onPick) {
+  container.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    container.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    onPick(b);
+  }));
+}
+function niceTicks(lo, hi, n = 4) {
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || mag * 10;
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  if (out[out.length - 1] < hi - 1e-9) out.push(+(out[out.length - 1] + step).toFixed(10));
+  return out;
+}
+
+const S = D.summary;
+document.getElementById("lede").textContent =
+  `${S.seasons} sezon, ${fmt(S.games)} maç ve ${fmt(S.players)} oyuncu. Faz 2'deki kural motoru, Faz 3'teki değerleme modeli ve Faz 5'teki agent'lar bu ambardan beslenecek.`;
+const tiles = [
+  ["Toplam satır", fmt(S.total_rows / 1e6, 2) + " M", `${D.tables.length} tablo`],
+  ["Play-by-play olayı", fmt(S.pbp_rows / 1e6, 1) + " M", "her şut, faul, ribaund"],
+  ["Maç", fmt(S.games), `${S.first_game.slice(0, 4)}–${S.last_game.slice(0, 4)}`],
+  ["Oyuncu", fmt(S.players), "en az bir maç oynamış"],
+];
+const tilesEl = document.getElementById("tiles");
+tiles.forEach(([k, v, n]) => tilesEl.appendChild(h("div", { class: "tile" }, `<div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div>`)));
+
+const tlist = document.getElementById("tlist");
+const maxLog = Math.log10(Math.max(...D.tables.map(t => t.rows)) + 1);
+D.tables.forEach((t, i) => {
+  const row = h("button", { class: "trow", type: "button", "aria-expanded": "false", id: `trow-${i}` });
+  const w = t.rows ? Math.max(1, Math.log10(t.rows + 1) / maxLog * 100) : 0;
+  row.innerHTML = `<span class="nm">${t.name}</span><span class="track"><span class="bar" style="display:block;width:${w}%"></span></span><span class="ct">${fmt(t.rows)}</span>`;
+  const detail = h("div", { class: "detail" }); detail.hidden = true;
+  const cols = t.columns.map(c => `<span class="chip">${c.name} <i>${c.type.toLowerCase()}</i></span>`).join("");
+  const sample = t.sample.length
+    ? `<div class="scroll"><table class="data"><thead><tr>${t.sample_columns.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${
+        t.sample.map(r => `<tr>${t.sample_columns.map(c => `<td>${fmtCell(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+    : `<p class="note">Henüz satır yok.</p>`;
+  detail.innerHTML = `<p>${t.description}</p><p><b>Kullanım:</b> ${t.use}</p><div class="chips">${cols}</div>${sample}`;
+  row.addEventListener("click", () => {
+    const open = row.getAttribute("aria-expanded") === "true";
+    row.setAttribute("aria-expanded", open ? "false" : "true"); detail.hidden = open;
+  });
+  tlist.append(row, detail);
+});
+function fmtCell(v) {
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  if (typeof v === "boolean") return v ? "evet" : "hayır";
+  if (typeof v === "number") return Number.isInteger(v) ? (Math.abs(v) >= 1e5 ? fmt(v) : String(v)) : fmt(v, v < 1 && v > -1 ? 3 : 1);
+  const s = String(v);
+  if (/^\d{4}-\d\d-\d\dT/.test(s)) return s.slice(0, 10);
+  return s.length > 42 ? s.slice(0, 40) + "…" : s;
+}
+
+function lineChart(target, series, opts) {
+  target.innerHTML = "";
+  const W = 520, H = opts.height || 260, m = { t: 14, r: opts.right || 56, b: 28, l: 44 };
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img", "aria-label": opts.label });
+  target.appendChild(svg);
+  const xs = series[0].values.map(d => d.x);
+  const all = series.flatMap(s => s.values.map(d => d.y));
+  let lo = opts.min ?? Math.min(...all), hi = opts.max ?? Math.max(...all);
+  const pad = (hi - lo) * 0.08 || 1; if (opts.min === undefined) lo -= pad; if (opts.max === undefined) hi += pad;
+  const ticks = niceTicks(lo, hi, 4); lo = Math.min(lo, ticks[0]); hi = Math.max(hi, ticks[ticks.length - 1]);
+  const X = i => m.l + i * (W - m.l - m.r) / (xs.length - 1);
+  const Y = v => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
+  ticks.forEach(t => {
+    el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), class: "gridline" }, svg);
+    el("text", { x: m.l - 6, y: Y(t) + 4, "text-anchor": "end", class: "tick" }, svg).textContent = opts.tick(t);
+  });
+  el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "baseline" }, svg);
+  xs.forEach((x, i) => { if (i % 3 === 0 || i === xs.length - 1)
+    el("text", { x: X(i), y: H - 8, "text-anchor": "middle", class: "tick" }, svg).textContent = x; });
+  series.forEach(s => {
+    const d = s.values.map((p, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(p.y).toFixed(1)}`).join("");
+    if (opts.area && series.length === 1) {
+      const a = el("path", { d: d + `L${X(xs.length - 1)},${H - m.b}L${X(0)},${H - m.b}Z`, fill: s.color, opacity: 0.10 }, svg);
+    }
+    el("path", { d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+    const last = s.values[s.values.length - 1];
+    el("circle", { cx: X(xs.length - 1), cy: Y(last.y), r: 4, fill: s.color, stroke: "var(--panel)", "stroke-width": 2 }, svg);
+  });
+  if (opts.direct) {
+    const labels = series.map(s => { const v = s.values[s.values.length - 1].y; return { y: Y(v), text: (s.short ? s.short + " " : "") + opts.tick(v) }; })
+      .sort((a, b) => a.y - b.y);
+    for (let k = 1; k < labels.length; k++) labels[k].y = Math.max(labels[k].y, labels[k - 1].y + 14);
+    const overflow = labels.length ? labels[labels.length - 1].y - (H - m.b) : 0;
+    if (overflow > 0) labels.forEach(l => { l.y -= overflow; });
+    labels.forEach(l => { el("text", { x: X(xs.length - 1) + 8, y: l.y + 4, class: "lbl" }, svg).textContent = l.text; });
+  }
+  const cross = el("line", { y1: m.t, y2: H - m.b, stroke: "var(--axis)", "stroke-width": 1, visibility: "hidden" }, svg);
+  const dots = series.map(s => el("circle", { r: 4, fill: s.color, stroke: "var(--panel)", "stroke-width": 2, visibility: "hidden" }, svg));
+  const hit = el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" }, svg);
+  hit.addEventListener("pointermove", ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const i = Math.max(0, Math.min(xs.length - 1, Math.round((loc.x - m.l) / ((W - m.l - m.r) / (xs.length - 1)))));
+    cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("visibility", "visible");
+    dots.forEach((c, k) => { c.setAttribute("cx", X(i)); c.setAttribute("cy", Y(series[k].values[i].y)); c.setAttribute("visibility", "visible"); });
+    showTip(`<b>${xs[i]}</b><br>` + series.map(s => `<span class="sw line" style="background:${s.color};display:inline-block;vertical-align:middle"></span> ${s.name}: <b>${opts.tick(s.values[i].y, true)}</b>`).join("<br>"), ev);
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); dots.forEach(c => c.setAttribute("visibility", "hidden")); hideTip(); });
+}
+
+const METRICS = [
+  { k: "three_rate", name: "Üçlük oranı", tick: (v, f) => pct(v, f ? 1 : 0), note: "Şutların üçlük olan payı" },
+  { k: "ts", name: "True Shooting", tick: (v, f) => pct(v, 1), note: "Şut verimliliği" },
+  { k: "pace", name: "Tempo", tick: (v, f) => fmt(v, f ? 1 : 0), note: "48 dakikadaki hücum sayısı" },
+  { k: "team_ppg", name: "Takım sayı ort.", tick: (v, f) => fmt(v, f ? 1 : 0), note: "Maç başına takım sayısı" },
+  { k: "avg_age", name: "Ortalama yaş", tick: (v, f) => fmt(v, 1), note: "500+ dakika oynayanlar" },
+];
+const tseg = document.getElementById("trend-seg");
+METRICS.forEach((mm, i) => tseg.appendChild(h("button", { type: "button", "data-k": mm.k, "aria-pressed": i ? "false" : "true" }, mm.name)));
+function drawTrend(k) {
+  const mm = METRICS.find(x => x.k === k);
+  lineChart(document.getElementById("trend-chart"),
+    [{ name: mm.name, color: "var(--s1)", values: D.trends.map(d => ({ x: d.season, y: d[k] })) }],
+    { tick: mm.tick, label: mm.name, area: true, direct: true, right: 60 });
+}
+segment(tseg, b => drawTrend(b.dataset.k)); drawTrend("three_rate");
+
+const ZONES = [
+  { k: "three", name: "Üçlük", short: "Üçlük", color: "var(--s1)" },
+  { k: "rim", name: "Pota altı (<4 ft)", short: "Pota", color: "var(--s2)" },
+  { k: "short_mid", name: "Kısa orta (4–13 ft)", short: "Kısa", color: "var(--s3)" },
+  { k: "long_mid", name: "Uzun orta (14+ ft)", short: "Uzun", color: "var(--s4)" },
+];
+document.getElementById("zone-legend").innerHTML = ZONES.map(z => `<span><i class="sw line" style="background:${z.color}"></i>${z.name}</span>`).join("");
+lineChart(document.getElementById("zone-chart"),
+  ZONES.map(z => ({ name: z.name, short: z.short, color: z.color, values: D.zones.map(d => ({ x: d.season, y: d[z.k] })) })),
+  { tick: (v, f) => pct(v, f ? 1 : 0), label: "Şut bölgeleri", min: 0, direct: true, right: 76 });
+
+const seasons = Object.keys(D.shots).sort();
+const range = document.getElementById("season-range"); range.max = seasons.length - 1; range.value = seasons.length - 1;
+let shotMode = "share";
+const court = document.getElementById("court");
+const csvg = el("svg", { viewBox: "-260 -60 520 440", width: "100%", role: "img", "aria-label": "Şut haritası" });
+court.appendChild(csvg);
+const cells = el("g", {}, csvg);
+const lines = el("g", { fill: "none", stroke: "var(--court)", "stroke-width": 2 }, csvg);
+[
+  ["rect", { x: -250, y: -47.5, width: 500, height: 417.5 }],
+  ["rect", { x: -80, y: -47.5, width: 160, height: 190 }],
+  ["rect", { x: -60, y: -47.5, width: 120, height: 190 }],
+  ["circle", { cx: 0, cy: 142.5, r: 60 }],
+  ["line", { x1: -30, x2: 30, y1: -7.5, y2: -7.5 }],
+  ["circle", { cx: 0, cy: 0, r: 7.5 }],
+  ["path", { d: "M-40,0 A40,40 0 0 0 40,0" }],
+  ["line", { x1: -220, x2: -220, y1: -47.5, y2: 92.5 }],
+  ["line", { x1: 220, x2: 220, y1: -47.5, y2: 92.5 }],
+  ["path", { d: "M-220,92.5 A237.5,237.5 0 0 0 220,92.5" }],
+].forEach(([t, a]) => el(t, a, lines));
+const SEQ = ["--seq-0", "--seq-1", "--seq-2", "--seq-3", "--seq-4", "--seq-5", "--seq-6", "--seq-7"];
+function drawCourt() {
+  const s = seasons[+range.value];
+  document.getElementById("season-label").textContent = s;
+  const data = D.shots[s];
+  const total = data.reduce((a, c) => a + c[2], 0);
+  cells.innerHTML = "";
+  const shares = data.map(c => c[2] / total);
+  const maxShare = 0.02;
+  data.forEach(([gx, gy, fga, fgm]) => {
+    let level;
+    if (shotMode === "share") level = Math.min(7, Math.floor(Math.sqrt(Math.min(1, (fga / total) / maxShare)) * 8));
+    else { if (fga < 150) return; level = Math.max(0, Math.min(7, Math.floor((fgm / fga - 0.30) / 0.35 * 8))); }
+    const r = el("rect", { x: gx * 20 - 250 + 1, y: gy * 20 - 50 + 1, width: 18, height: 18, rx: 3, fill: `var(${SEQ[level]})` }, cells);
+    r.addEventListener("pointermove", ev => showTip(`<b>${s}</b><br>${fmt(fga)} şut, isabet <b>${pct(fgm / fga)}</b><br><span class="m">Sezonun şutlarının ${pct(fga / total, 2)}'i</span>`, ev));
+    r.addEventListener("pointerleave", hideTip);
+  });
+  const z = D.zones.find(d => d.season === s);
+  const side = document.getElementById("court-side");
+  side.innerHTML = `<div class="k" style="font-size:13px;color:var(--muted)">${s} sezonu</div><div class="big">${fmt(total)}</div><div style="font-size:13px;color:var(--ink-2)">saha içi şut</div>` +
+    ZONES.map(zz => `<div class="zone-row"><span>${zz.short === "Üçlük" ? "Üçlük" : zz.name.split(" (")[0]}</span><span><span class="b" style="display:block;width:${z[zz.k] / 0.5 * 100}%;background:${zz.color}"></span></span><span class="p">${pct(z[zz.k], 0)}</span></div>`).join("");
+  document.getElementById("court-note").textContent = shotMode === "share"
+    ? "Koyu kareler şutların yoğunlaştığı yerler. 2010-11'den bu yana orta mesafe boşalıyor, üçlük çizgisinin hemen arkası doluyor."
+    : "İsabet yüzdesi, 150'den az şut atılan kareler hariç. Açık renk %30, koyu renk %65 ve üstü.";
+}
+range.addEventListener("input", drawCourt);
+segment(document.getElementById("shot-mode"), b => { shotMode = b.dataset.mode; drawCourt(); });
+let timer = null;
+const playBtn = document.getElementById("play");
+playBtn.addEventListener("click", () => {
+  if (timer) { clearInterval(timer); timer = null; playBtn.textContent = "▶ Oynat"; return; }
+  if (+range.value === seasons.length - 1) range.value = 0;
+  playBtn.textContent = "❚❚ Durdur"; drawCourt();
+  timer = setInterval(() => {
+    if (+range.value >= seasons.length - 1) { clearInterval(timer); timer = null; playBtn.textContent = "▶ Oynat"; return; }
+    range.value = +range.value + 1; drawCourt();
+  }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1400 : 700);
+});
+drawCourt();
+
+const W8 = D.ws.stats;
+const wsT = document.getElementById("ws-tiles");
+[["Medyan", fmt(W8.median, 1), "WS / sezon"], ["En iyi %10", fmt(W8.p90, 1) + "+", "WS / sezon"], ["Yıldan yıla korelasyon", fmt(W8.autocorr, 2), `${fmt(W8.pairs)} oyuncu çifti`]]
+  .forEach(([k, v, n]) => wsT.appendChild(h("div", { class: "tile" }, `<div class="k">${k}</div><div class="v" style="font-size:28px">${v}</div><div class="n">${n}</div>`)));
+(function hist() {
+  const t = document.getElementById("ws-hist");
+  const data = D.ws.hist, W = 520, H = 230, m = { t: 10, r: 10, b: 30, l: 40 };
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img", "aria-label": "Win Shares dağılımı" }); t.appendChild(svg);
+  const maxN = Math.max(...data.map(d => d.n)), ticks = niceTicks(0, maxN, 4);
+  const top = ticks[ticks.length - 1];
+  const bw = (W - m.l - m.r) / data.length;
+  const Y = v => H - m.b - v / top * (H - m.t - m.b);
+  ticks.forEach(v => { el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: "gridline" }, svg);
+    el("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", class: "tick" }, svg).textContent = fmt(v); });
+  data.forEach((d, i) => {
+    const x = m.l + i * bw, y = Y(d.n);
+    const r = el("path", { d: `M${x + 1},${H - m.b}V${y + 4}q0,-4 4,-4h${bw - 10}q4,0 4,4V${H - m.b}Z`, fill: "var(--s1)" }, svg);
+    r.addEventListener("pointermove", ev => showTip(`<b>${d.bin} – ${d.bin + 1} WS</b><br>${fmt(d.n)} oyuncu-sezon`, ev));
+    r.addEventListener("pointerleave", hideTip);
+    if (d.bin % 3 === 0) el("text", { x: x + bw / 2, y: H - 10, "text-anchor": "middle", class: "tick" }, svg).textContent = d.bin;
+  });
+  el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "baseline" }, svg);
+  t.appendChild(h("p", { class: "note" }, `${fmt(W8.n)} oyuncu-sezon. Dağılım sağa çarpık: çoğu oyuncu 0–5 WS arasında, yıldızlar uzun kuyrukta. Bir sezonun WS'si bir sonrakiyle ${fmt(W8.autocorr, 2)} korelasyonlu; modelin geçmesi gereken çıta bu.`));
+})();
+const COLS = [["player_name", "Oyuncu"], ["team", "Takım"], ["age", "Yaş", 1], ["ws", "WS", 1], ["bpm", "BPM", 1], ["vorp", "VORP", 1], ["ppg", "Sayı", 1], ["ts", "TS%", 1]];
+let sortKey = "ws", sortDir = -1;
+function drawTop() {
+  const rowsT = [...D.ws.top].sort((a, b) => (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir);
+  document.getElementById("top-table").innerHTML =
+    `<thead><tr>${COLS.map(([k, n, num]) => `<th class="${num ? "num" : ""}"><button type="button" data-k="${k}" ${k === sortKey ? `aria-sort="${sortDir < 0 ? "descending" : "ascending"}"` : ""}>${n}${k === sortKey ? (sortDir < 0 ? " ↓" : " ↑") : ""}</button></th>`).join("")}</tr></thead>` +
+    `<tbody>${rowsT.map(r => `<tr>${COLS.map(([k, , num]) => `<td class="${num ? "num" : ""}">${k === "ts" ? pct(r[k]) : num ? fmt(r[k], k === "age" ? 0 : 1) : r[k]}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  document.querySelectorAll("#top-table th button").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.k === sortKey) sortDir *= -1; else { sortKey = b.dataset.k; sortDir = typeof D.ws.top[0][sortKey] === "string" ? 1 : -1; }
+    drawTop();
+  }));
+}
+drawTop();
+
+let payKey = "y1", payTeam = null;
+function drawPay() {
+  const t = document.getElementById("pay-chart"); t.innerHTML = "";
+  const data = [...D.payroll].sort((a, b) => (b[payKey] || 0) - (a[payKey] || 0));
+  const rowH = 17, W = 480, m = { t: 6, r: 56, b: 24, l: 40 }, H = m.t + m.b + data.length * rowH;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img", "aria-label": "Takım maaşları" }); t.appendChild(svg);
+  const maxV = Math.max(...data.map(d => d[payKey] || 0)), ticks = niceTicks(0, maxV / 1e6, 4), top = ticks[ticks.length - 1] * 1e6;
+  const X = v => m.l + v / top * (W - m.l - m.r);
+  ticks.forEach(v => { el("line", { x1: X(v * 1e6), x2: X(v * 1e6), y1: m.t, y2: H - m.b, class: "gridline" }, svg);
+    el("text", { x: X(v * 1e6), y: H - 8, "text-anchor": "middle", class: "tick" }, svg).textContent = "$" + v + "M"; });
+  data.forEach((d, i) => {
+    const y = m.t + i * rowH, v = d[payKey] || 0, sel = d.team === payTeam;
+    el("text", { x: m.l - 6, y: y + rowH / 2 + 4, "text-anchor": "end", class: sel ? "lbl-strong" : "tick" }, svg).textContent = d.team;
+    const bar = el("path", { d: `M${m.l},${y + 3}H${X(v) - 3}q3,0 3,3V${y + rowH - 6}q0,3 -3,3H${m.l}Z`, fill: sel ? "var(--s2)" : "var(--s1)" }, svg);
+    if (i < 3 || sel) el("text", { x: X(v) + 6, y: y + rowH / 2 + 4, class: "lbl" }, svg).textContent = money(v);
+    const hit = el("rect", { x: 0, y, width: W, height: rowH, fill: "transparent", style: "cursor:pointer" }, svg);
+    hit.addEventListener("pointermove", ev => showTip(`<b>${d.name}</b><br>${payKey === "y1" ? "2026-27" : "2027-28"}: <b>${money(v)}</b><br><span class="m">${d.contracts} kontrat · tıkla: detay</span>`, ev));
+    hit.addEventListener("pointerleave", hideTip);
+    hit.addEventListener("click", () => { payTeam = d.team; drawPay(); });
+  });
+  el("line", { x1: m.l, x2: m.l, y1: m.t, y2: H - m.b, class: "baseline" }, svg);
+  const d = D.payroll.find(x => x.team === payTeam) || data[0];
+  payTeam = d.team;
+  document.getElementById("pay-detail").innerHTML =
+    `<div class="eyebrow">${d.team}</div><div style="font-family:var(--display);font-weight:700;font-size:26px;line-height:1.1">${d.name}</div>` +
+    `<div style="display:flex;gap:18px;margin:10px 0 14px;flex-wrap:wrap"><div><div class="tick" style="font-size:12px">2026-27</div><b>${money(d.y1)}</b></div><div><div class="tick" style="font-size:12px">2027-28</div><b>${money(d.y2 || 0)}</b></div><div><div class="tick" style="font-size:12px">Kontrat</div><b>${d.contracts}</b></div></div>` +
+    `<table class="data"><thead><tr><th>En büyük 5 kontrat</th><th class="num">2026-27</th><th class="num">Kalan yıl</th></tr></thead><tbody>${
+      d.top.map(r => `<tr><td>${r.player_name}${r.option_type !== "none" ? ` <span class="pill">${r.option_type === "player" ? "oyuncu opsiyonu" : "takım opsiyonu"}</span>` : ""}</td><td class="num">${money(r.salary)}</td><td class="num">${r.years}</td></tr>`).join("")}</tbody></table>`;
+}
+segment(document.getElementById("pay-seg"), b => { payKey = b.dataset.k; drawPay(); });
+drawPay();
+
+const YEARS = [2027, 2028, 2029, 2030, 2031, 2032, 2033];
+let pickRound = 1, pickSort = "total";
+function teamPicks(team, round) {
+  return YEARS.map(y => {
+    const A = D.picks.assets.filter(a => a.year === y && a.round === round);
+    const own = A.find(a => a.original === team && (a.kind === "own" || a.kind === "acquired"));
+    const incoming = A.filter(a => a.owner === team && a.kind === "acquired" && a.original !== team);
+    const extras = A.filter(a => a.owner === team && (a.kind === "swap_right" || a.kind === "conditional"));
+    const encumbered = A.filter(a => a.kind === "swap_right" && a.owner !== team && a.original_teams.split(",").includes(team));
+    return { y, ownHeld: own && own.owner === team, ownTo: own && own.owner !== team ? own.owner : null, ownProt: own && own.protection, incoming, extras, encumbered };
+  });
+}
+function drawPicks() {
+  const g = document.getElementById("picks");
+  g.style.gridTemplateColumns = `86px repeat(${YEARS.length}, minmax(38px, 1fr))`;
+  g.style.minWidth = "420px";
+  const rowsP = D.picks.teams.map(t => { const c = teamPicks(t, pickRound); return { t, c, total: c.reduce((a, x) => a + (x.ownHeld ? 1 : 0) + x.incoming.length, 0) }; });
+  rowsP.sort((a, b) => pickSort === "alpha" ? a.t.localeCompare(b.t) : b.total - a.total || a.t.localeCompare(b.t));
+  g.innerHTML = `<div></div>` + YEARS.map(y => `<div class="pk-h">${y}</div>`).join("");
+  rowsP.forEach(({ t, c, total }) => {
+    g.appendChild(h("div", { class: "pk-t" }, `${t} <small>${total}</small>`));
+    c.forEach(x => {
+      const cell = h("div", { class: "pk" + (x.ownHeld ? " own" : " out"), tabindex: "0" });
+      if (x.ownHeld && x.encumbered.length) cell.appendChild(h("span", { class: "hatch" }));
+      if (x.incoming.length) cell.appendChild(h("span", { class: "badge" }, "+" + x.incoming.length));
+      if (x.extras.length) cell.appendChild(h("span", { class: "dot" }));
+      const lines = [`<b>${t} · ${x.y} ${pickRound}. tur</b>`];
+      lines.push(x.ownHeld ? `Kendi pick'i elinde${x.ownProt ? ` <span class="m">(${x.ownProt})</span>` : ""}` : `Kendi pick'i → <b>${x.ownTo}</b>${x.ownProt ? ` <span class="m">(${x.ownProt})</span>` : ""}`);
+      x.incoming.forEach(a => lines.push(`+ ${a.original} pick'i${a.protection ? ` <span class="m">(${a.protection})</span>` : ""}`));
+      x.extras.forEach(a => lines.push(`◦ ${a.kind === "swap_right" ? "Swap hakkı" : "Koşullu pick"}: ${a.original_teams}${a.description ? ` <span class="m">(${a.description})</span>` : ""}`));
+      x.encumbered.forEach(a => lines.push(`<span class="m">${a.owner} bu pick üzerinde swap hakkına sahip</span>`));
+      const html = lines.join("<br>");
+      cell.addEventListener("pointermove", ev => showTip(html, ev));
+      cell.addEventListener("pointerleave", hideTip);
+      cell.addEventListener("focus", () => { const r = cell.getBoundingClientRect(); showTip(html, { clientX: r.right, clientY: r.bottom }); });
+      cell.addEventListener("blur", hideTip);
+      g.appendChild(cell);
+    });
+  });
+}
+segment(document.getElementById("round-seg"), b => { pickRound = +b.dataset.r; drawPicks(); });
+segment(document.getElementById("sort-seg"), b => { pickSort = b.dataset.s; drawPicks(); });
+drawPicks();
+
+lineChart(document.getElementById("pbp-chart"),
+  [{ name: "Eşleşme", color: "var(--s3)", values: D.pbp.map(d => ({ x: d.season, y: d.match_pct })) }],
+  { tick: (v, f) => fmt(v, f ? 3 : 1) + "%", label: "Sayı mutabakatı", min: 99.0, max: 100.0, area: false, direct: true, height: 220, right: 64 });
+document.getElementById("pbp-chart").appendChild(h("p", { class: "note" }, `${fmt(D.pbp.reduce((a, d) => a + d.player_games, 0))} oyuncu-maç karşılaştırıldı. Kalan farklar kaynaktaki kayıt hataları; örneğin bir basketin play-by-play'de yanlış oyuncuya yazılması.`));
+const Q = D.quality;
+document.getElementById("qpill").textContent = `${Q.checks.length - Q.failures.length} / ${Q.checks.length} geçti`;
+document.getElementById("checks").innerHTML = Q.checks.map(c => `<li>${c}</li>`).join("");
+</script>

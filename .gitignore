@@ -23,3 +23,7 @@ evals/results/tmp/
 
 # Local reference copy, not part of the project
 public-apis-master/
+
+# Generated report pages
+reports/*.html
+!reports/data_overview_template.html

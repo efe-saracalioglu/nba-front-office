@@ -1,0 +1,19 @@
+{
+  "model": "ollama:gpt-oss:120b-cloud",
+  "cases": 3,
+  "parse_failures": 0,
+  "verdict_accuracy": 1.0,
+  "exact_match": 1.0,
+  "error_rate": 0.0,
+  "false_valid_rate": 0.0,
+  "false_invalid_rate": 0.0,
+  "code_precision": 0.0,
+  "code_recall": 0.0,
+  "per_bucket_exact": {
+    "VALID": "3/3"
+  },
+  "avg_seconds": 7.82,
+  "avg_input_tokens": 1373,
+  "avg_output_tokens": 1658,
+  "predicted_codes": {}
+}
