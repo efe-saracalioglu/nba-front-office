@@ -1,0 +1,257 @@
+{
+  "trained_at": "2026-10-20T08:17:40+00:00",
+  "target": "next-season Win Shares scaled to 82 games",
+  "features": [
+    "age",
+    "age_sq",
+    "height_in",
+    "weight_lb",
+    "draft_number",
+    "years_in_league",
+    "seasons_of_history",
+    "ws_82",
+    "minute_share",
+    "game_share",
+    "start_share",
+    "net_rating",
+    "pie",
+    "vorp_82",
+    "z_per",
+    "z_ts_pct",
+    "z_fg3a_rate",
+    "z_fta_rate",
+    "z_orb_pct",
+    "z_drb_pct",
+    "z_trb_pct",
+    "z_ast_pct",
+    "z_stl_pct",
+    "z_blk_pct",
+    "z_tov_pct",
+    "z_usg_pct",
+    "z_ws_per_48",
+    "z_obpm",
+    "z_dbpm",
+    "z_bpm",
+    "ws_82_lag1",
+    "ws_82_lag2",
+    "ws_per_48_lag1",
+    "ws_per_48_lag2",
+    "bpm_lag1",
+    "bpm_lag2",
+    "obpm_lag1",
+    "obpm_lag2",
+    "dbpm_lag1",
+    "dbpm_lag2",
+    "minute_share_lag1",
+    "minute_share_lag2",
+    "game_share_lag1",
+    "game_share_lag2",
+    "usg_pct_lag1",
+    "usg_pct_lag2",
+    "ts_pct_lag1",
+    "ts_pct_lag2",
+    "ws48_delta",
+    "bpm_delta",
+    "minute_share_delta",
+    "marcel_ws48",
+    "marcel_minutes"
+  ],
+  "rows": 5459,
+  "train_seasons": [
+    "2010-11",
+    "2024-25"
+  ],
+  "valid_years": [
+    2022,
+    2023
+  ],
+  "test_years": [
+    2024,
+    2025
+  ],
+  "params": {
+    "objective": "huber",
+    "num_leaves": 7,
+    "learning_rate": 0.02,
+    "n_estimators": 900,
+    "min_child_samples": 40,
+    "subsample": 0.7,
+    "colsample_bytree": 0.5,
+    "reg_lambda": 0.0
+  },
+  "conformal_margin": 0.204,
+  "tuning_top5": [
+    {
+      "params": {
+        "objective": "huber",
+        "num_leaves": 7,
+        "learning_rate": 0.02,
+        "n_estimators": 900,
+        "min_child_samples": 40,
+        "subsample": 0.7,
+        "colsample_bytree": 0.5,
+        "reg_lambda": 0.0
+      },
+      "cv_mae": 1.4051
+    },
+    {
+      "params": {
+        "objective": "regression_l1",
+        "num_leaves": 7,
+        "learning_rate": 0.05,
+        "n_estimators": 300,
+        "min_child_samples": 20,
+        "subsample": 0.7,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 5.0
+      },
+      "cv_mae": 1.4078
+    },
+    {
+      "params": {
+        "objective": "huber",
+        "num_leaves": 7,
+        "learning_rate": 0.02,
+        "n_estimators": 600,
+        "min_child_samples": 20,
+        "subsample": 0.7,
+        "colsample_bytree": 0.7,
+        "reg_lambda": 0.0
+      },
+      "cv_mae": 1.4082
+    },
+    {
+      "params": {
+        "objective": "regression_l1",
+        "num_leaves": 7,
+        "learning_rate": 0.05,
+        "n_estimators": 300,
+        "min_child_samples": 80,
+        "subsample": 0.85,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 5.0
+      },
+      "cv_mae": 1.4093
+    },
+    {
+      "params": {
+        "objective": "regression_l1",
+        "num_leaves": 7,
+        "learning_rate": 0.02,
+        "n_estimators": 900,
+        "min_child_samples": 40,
+        "subsample": 0.7,
+        "colsample_bytree": 0.5,
+        "reg_lambda": 0.0
+      },
+      "cv_mae": 1.4096
+    }
+  ],
+  "validation": {
+    "persistence": {
+      "mae": 1.43,
+      "rmse": 1.909,
+      "r2": 0.515,
+      "spearman": 0.687
+    },
+    "marcel": {
+      "mae": 1.451,
+      "rmse": 1.846,
+      "r2": 0.547,
+      "spearman": 0.693
+    },
+    "ridge": {
+      "mae": 1.376,
+      "rmse": 1.765,
+      "r2": 0.586,
+      "spearman": 0.711
+    },
+    "lightgbm": {
+      "mae": 1.333,
+      "rmse": 1.737,
+      "r2": 0.599,
+      "spearman": 0.721
+    },
+    "interval": {
+      "target_coverage": 0.8,
+      "raw_quantile_coverage": 0.77,
+      "conformal_coverage": 0.803,
+      "conformal_margin": 0.125,
+      "mean_width": 4.385
+    }
+  },
+  "test": {
+    "persistence": {
+      "mae": 1.629,
+      "rmse": 2.156,
+      "r2": 0.348,
+      "spearman": 0.615
+    },
+    "marcel": {
+      "mae": 1.494,
+      "rmse": 1.914,
+      "r2": 0.486,
+      "spearman": 0.651
+    },
+    "ridge": {
+      "mae": 1.473,
+      "rmse": 1.912,
+      "r2": 0.487,
+      "spearman": 0.647
+    },
+    "lightgbm": {
+      "mae": 1.433,
+      "rmse": 1.901,
+      "r2": 0.493,
+      "spearman": 0.669
+    },
+    "interval": {
+      "target_coverage": 0.8,
+      "raw_quantile_coverage": 0.714,
+      "conformal_coverage": 0.767,
+      "conformal_margin": 0.125,
+      "mean_width": 4.281
+    }
+  },
+  "test_breakdown": {
+    "age": {
+      "<=23": {
+        "n": 255,
+        "marcel_mae": 1.417,
+        "lightgbm_mae": 1.358
+      },
+      "24-27": {
+        "n": 275,
+        "marcel_mae": 1.615,
+        "lightgbm_mae": 1.521
+      },
+      "28-31": {
+        "n": 155,
+        "marcel_mae": 1.531,
+        "lightgbm_mae": 1.554
+      },
+      "32+": {
+        "n": 89,
+        "marcel_mae": 1.275,
+        "lightgbm_mae": 1.169
+      }
+    },
+    "minutes": {
+      "250-1000": {
+        "n": 257,
+        "marcel_mae": 1.198,
+        "lightgbm_mae": 1.065
+      },
+      "1000-2000": {
+        "n": 328,
+        "marcel_mae": 1.477,
+        "lightgbm_mae": 1.414
+      },
+      "2000+": {
+        "n": 189,
+        "marcel_mae": 1.925,
+        "lightgbm_mae": 1.968
+      }
+    }
+  }
+}

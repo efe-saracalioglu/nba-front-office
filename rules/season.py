@@ -51,6 +51,7 @@ class SeasonConfig(BaseModel):
     sources: list[str] = []
     salary_cap: int
     minimum_team_salary: int
+    minimum_salary: int
     luxury_tax: int
     first_apron: int
     second_apron: int

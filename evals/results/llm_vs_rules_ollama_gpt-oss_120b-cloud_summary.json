@@ -1,19 +1,41 @@
 {
   "model": "ollama:gpt-oss:120b-cloud",
-  "cases": 3,
+  "cases": 100,
   "parse_failures": 0,
-  "verdict_accuracy": 1.0,
-  "exact_match": 1.0,
-  "error_rate": 0.0,
-  "false_valid_rate": 0.0,
+  "verdict_accuracy": 0.99,
+  "exact_match": 0.94,
+  "error_rate": 0.06,
+  "false_valid_rate": 0.017,
   "false_invalid_rate": 0.0,
-  "code_precision": 0.0,
-  "code_recall": 0.0,
+  "code_precision": 0.961,
+  "code_recall": 0.948,
   "per_bucket_exact": {
-    "VALID": "3/3"
+    "ABSORB_WITHOUT_ROOM": "3/5",
+    "CASH_LIMIT": "3/4",
+    "PICK_NOT_OWNED": "3/3",
+    "RECENTLY_SIGNED": "6/6",
+    "ROSTER_MAX": "5/6",
+    "SALARY_MATCHING": "10/10",
+    "SALARY_MATCHING_APRON": "9/10",
+    "SECOND_APRON_AGGREGATION": "5/5",
+    "SECOND_APRON_CASH": "2/3",
+    "STEPIEN": "6/6",
+    "VALID": "42/42"
   },
-  "avg_seconds": 7.82,
-  "avg_input_tokens": 1373,
-  "avg_output_tokens": 1658,
-  "predicted_codes": {}
+  "avg_seconds": 9.78,
+  "avg_input_tokens": 1391,
+  "avg_output_tokens": 1829,
+  "predicted_codes": {
+    "ABSORB_WITHOUT_ROOM": 5,
+    "STEPIEN": 6,
+    "PICK_OUT_OF_WINDOW": 1,
+    "ROSTER_MAX": 9,
+    "SALARY_MATCHING_APRON": 16,
+    "RECENTLY_SIGNED": 8,
+    "SECOND_APRON_AGGREGATION": 7,
+    "CASH_LIMIT": 4,
+    "SALARY_MATCHING": 13,
+    "SECOND_APRON_CASH": 4,
+    "PICK_NOT_OWNED": 3
+  }
 }

@@ -2,30 +2,31 @@
   "model": "ollama:llama3.1:8b",
   "cases": 100,
   "parse_failures": 0,
-  "verdict_accuracy": 0.6,
-  "exact_match": 0.15,
-  "error_rate": 0.85,
-  "false_valid_rate": 0.069,
-  "false_invalid_rate": 0.857,
-  "code_precision": 0.111,
-  "code_recall": 0.13,
+  "verdict_accuracy": 0.57,
+  "exact_match": 0.16,
+  "error_rate": 0.84,
+  "false_valid_rate": 0.207,
+  "false_invalid_rate": 0.738,
+  "code_precision": 0.09,
+  "code_recall": 0.091,
   "per_bucket_exact": {
     "ABSORB_WITHOUT_ROOM": "0/5",
     "CASH_LIMIT": "0/4",
     "PICK_NOT_OWNED": "0/3",
     "RECENTLY_SIGNED": "0/6",
     "ROSTER_MAX": "0/6",
-    "SALARY_MATCHING": "9/10",
+    "SALARY_MATCHING": "5/10",
     "SALARY_MATCHING_APRON": "0/10",
     "SECOND_APRON_AGGREGATION": "0/5",
     "SECOND_APRON_CASH": "0/3",
     "STEPIEN": "0/6",
-    "VALID": "6/42"
+    "VALID": "11/42"
   },
-  "avg_seconds": 6.66,
-  "avg_input_tokens": 1297,
-  "avg_output_tokens": 100,
+  "avg_seconds": 6.27,
+  "avg_input_tokens": 1339,
+  "avg_output_tokens": 91,
   "predicted_codes": {
-    "SALARY_MATCHING": 90
+    "SALARY_MATCHING": 77,
+    "SECOND_APRON_CASH": 1
   }
 }

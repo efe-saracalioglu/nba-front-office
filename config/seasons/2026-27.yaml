@@ -13,6 +13,7 @@ calendar:
 
 salary_cap: 164961000
 minimum_team_salary: 148465000
+minimum_salary: 1357763
 luxury_tax: 200428000
 first_apron: 209015000
 second_apron: 221686000

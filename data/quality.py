@@ -66,6 +66,12 @@ CHECKS: list[tuple[str, str, callable]] = [
         lambda n: n == 420,
     ),
     (
+        "projection intervals contain the point estimate",
+        """SELECT count(*) FROM player_projections
+           WHERE NOT (ws_p10 <= projected_ws AND projected_ws <= ws_p90)""",
+        lambda n: n == 0,
+    ),
+    (
         "no negative salaries",
         "SELECT count(*) FROM contracts WHERE salary <= 0",
         lambda n: n == 0,

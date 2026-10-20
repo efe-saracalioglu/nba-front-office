@@ -39,8 +39,10 @@ Two-way contracts never count toward payroll or matching. Picks and cash carry n
 4. CASH_LIMIT: no team may send or receive more than cash_limit in one trade.
 5. ROSTER_MAX: on or after regular_season_start a team may not end above max_standard standard contracts
    if the trade increases its count. TWO_WAY_MAX: at most max_two_way two-way contracts.
-6. STEPIEN: a team that trades away a first-round pick may not be left with zero first-round picks in two
-   consecutive drafts within the tradable years (use first_round_picks_owned_by_year after the trade).
+6. STEPIEN: when a team trades away a first-round pick for draft year Y, it may not be left (after the trade,
+   using first_round_picks_owned_by_year adjusted for this trade) with zero first-round picks in both Y-1 and Y,
+   or in both Y and Y+1, counting only tradable years. Gaps between other years that already existed before the
+   trade are not violations.
 7. PICK_NOT_OWNED: a team can only trade picks it currently owns (current_owner must equal the giver).
 8. RECENTLY_SIGNED: a player signed on or after 2026-07-01 cannot be traded before the later of
    offseason_signing_trade_date and 3 months after signing. Earlier signings wait 3 months.

@@ -22,8 +22,8 @@
     "STEPIEN": "0/6",
     "VALID": "42/42"
   },
-  "avg_seconds": 3.66,
-  "avg_input_tokens": 1307,
-  "avg_output_tokens": 18,
+  "avg_seconds": 3.86,
+  "avg_input_tokens": 1349,
+  "avg_output_tokens": 17,
   "predicted_codes": {}
 }

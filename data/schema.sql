@@ -166,6 +166,25 @@ CREATE TABLE IF NOT EXISTS draft_picks (
     inferred          BOOLEAN NOT NULL     -- TRUE when a transfer had no annotation and was inferred
 );
 
+-- Next-season projections from models/valuation (python -m models.valuation.predict).
+-- Win Shares are scaled to 82 games. Value is in dollars for the projected season.
+CREATE TABLE IF NOT EXISTS player_projections (
+    player_id         BIGINT PRIMARY KEY,
+    player_name       VARCHAR NOT NULL,
+    team_id           BIGINT,
+    based_on_season   VARCHAR NOT NULL,   -- last completed season used as input
+    projected_season  VARCHAR NOT NULL,
+    age_next          DOUBLE,
+    projected_ws      DOUBLE NOT NULL,    -- median projection
+    ws_p10            DOUBLE NOT NULL,    -- 80% interval, conformal-calibrated
+    ws_p90            DOUBLE NOT NULL,
+    salary            BIGINT,             -- projected-season salary, NULL if unknown
+    market_value      BIGINT,             -- minimum salary + dollars per Win Share x projected_ws
+    surplus_value     BIGINT,             -- market_value - salary
+    top_factors       VARCHAR,            -- JSON list of the largest SHAP contributions
+    model_version     VARCHAR NOT NULL
+);
+
 -- Populated by the Scout news pipeline (Phase 4).
 CREATE TABLE IF NOT EXISTS injuries (
     player_id         BIGINT NOT NULL,

@@ -5,7 +5,9 @@ from pathlib import Path
 
 from data import config, db
 
-FULL_TABLES = ["teams", "players", "rosters", "contracts", "draft_picks", "injuries"]
+FULL_TABLES = [
+    "teams", "players", "rosters", "contracts", "draft_picks", "injuries", "player_projections",
+]  # fmt: skip
 SEASON_TABLES = ["player_season_stats", "player_season_advanced", "team_season_stats"]
 
 

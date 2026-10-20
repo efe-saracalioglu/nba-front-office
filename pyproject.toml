@@ -16,6 +16,11 @@ dependencies = [
     "beautifulsoup4>=4.15.0",
     "lxml>=6.1.3",
     "python-dotenv>=1.2.4",
+    "lightgbm>=4.7.0",
+    "scikit-learn>=1.9.1",
+    "shap>=0.51.0",
+    "joblib>=1.6.0",
+    "matplotlib>=3.11.2",
 ]
 
 [dependency-groups]
@@ -23,6 +28,9 @@ dev = [
     "pytest>=8.3",
     "hypothesis>=6.112",
     "ruff>=0.6",
+    "nbformat>=5.11.1",
+    "nbconvert>=7.17.2",
+    "ipykernel>=7.4.0",
 ]
 
 [build-system]
@@ -44,9 +52,10 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 "reports/*" = ["E501"]  # page copy and labels
 "rules/**" = ["E501"]  # violation messages
 "evals/**" = ["E501"]  # prompts and case fixtures
+"models/**" = ["E501"]  # SQL and feature labels
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "rules/tests"]
+testpaths = ["tests", "rules/tests", "models/tests"]
 markers = [
     "integration: needs network or the full warehouse",
 ]

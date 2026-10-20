@@ -100,6 +100,7 @@ CHECK_LABELS = {
     "draft picks: every team has one own-pick asset per draft and round": "Her takımın her yıl ve tur için tek bir kendi pick'i var",
     "draft picks loaded (30 teams x 7 drafts x 2 rounds)": "420 pick yüklü (30 takım × 7 yıl × 2 tur)",
     "no negative salaries": "Negatif maaş yok",
+    "projection intervals contain the point estimate": "Her projeksiyon kendi güven aralığının içinde",
     "game logs sum to season totals (points, >=99% of player-seasons)": "Maç logları sezon toplamlarını veriyor (%99+)",
     "play-by-play points match box scores (>=99.5% of player-games)": "Play-by-play sayıları kutu skorlarıyla tutuyor (%99.5+)",
     "every box-score game has play-by-play (up to the last date covered)": "Her maçın play-by-play'i var",
