@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
+import duckdb
+
 from data.crosswalk import normalize_name
 from rules.models import PickAsset, Player, TeamState
 from rules.season import SeasonConfig, load_season
@@ -61,11 +63,16 @@ class LeagueState:
         return out
 
 
-def load_league(db_path: str | Path | None = None, season: str | None = None) -> LeagueState:
+def load_league(
+    db_path: str | Path | None = None,
+    season: str | None = None,
+    con: duckdb.DuckDBPyConnection | None = None,
+) -> LeagueState:
     from data import db
 
     cfg = load_season(season) if season else load_season()
-    con = db.connect(db_path, read_only=True)
+    owns_connection = con is None
+    con = con or db.connect(db_path, read_only=True)
     try:
         roster = con.execute(
             """
@@ -101,7 +108,8 @@ def load_league(db_path: str | Path | None = None, season: str | None = None) ->
         ).fetchall()
         abbrs = [r[0] for r in con.execute("SELECT abbreviation FROM teams").fetchall()]
     finally:
-        con.close()
+        if owns_connection:
+            con.close()
 
     teams = {a: TeamState(team=a) for a in abbrs}
     for pid, name, team, two_way, how, salary in roster:

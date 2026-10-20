@@ -21,6 +21,8 @@ dependencies = [
     "shap>=0.51.0",
     "joblib>=1.6.0",
     "matplotlib>=3.11.2",
+    "mcp[cli]>=2.3.0",
+    "feedparser>=6.0.14",
 ]
 
 [dependency-groups]
@@ -53,9 +55,10 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 "rules/**" = ["E501"]  # violation messages
 "evals/**" = ["E501"]  # prompts and case fixtures
 "models/**" = ["E501"]  # SQL and feature labels
+"mcp_server/**" = ["E501"]  # tool descriptions read by LLMs
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "rules/tests", "models/tests"]
+testpaths = ["tests", "rules/tests", "models/tests", "mcp_server/tests"]
 markers = [
     "integration: needs network or the full warehouse",
 ]
