@@ -11,7 +11,16 @@ OPENAI_COMPATIBLE = {
     "openrouter": ("https://openrouter.ai/api/v1", "OPENROUTER_API_KEY"),
     "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY"),
 }
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY")
+OLLAMA_URL = os.environ.get("OLLAMA_URL") or (
+    "https://ollama.com" if OLLAMA_API_KEY else "http://localhost:11434"
+)
+
+
+def ollama_request(model: str) -> tuple[str, dict]:
+    if OLLAMA_API_KEY and "ollama.com" in OLLAMA_URL:
+        return model.removesuffix("-cloud"), {"Authorization": f"Bearer {OLLAMA_API_KEY}"}
+    return model, {}
 
 
 @dataclass
@@ -23,6 +32,7 @@ class LLMResult:
 
 
 def _ollama(model: str, system: str, user: str, json_mode: bool, timeout: float) -> LLMResult:
+    model, headers = ollama_request(model)
     body = {
         "model": model,
         "stream": False,
@@ -32,7 +42,7 @@ def _ollama(model: str, system: str, user: str, json_mode: bool, timeout: float)
     if json_mode:
         body["format"] = "json"
     start = time.perf_counter()
-    r = httpx.post(f"{OLLAMA_URL}/api/chat", json=body, timeout=timeout)
+    r = httpx.post(f"{OLLAMA_URL}/api/chat", json=body, timeout=timeout, headers=headers)
     r.raise_for_status()
     d = r.json()
     return LLMResult(

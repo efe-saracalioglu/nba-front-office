@@ -1,0 +1,40 @@
+name: eval-smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  nba-bench-smoke:
+    runs-on: ubuntu-latest
+    env:
+      FRONT_OFFICE_DB: data/sample/warehouse_sample.duckdb
+      FRONT_OFFICE_TRACING: "0"
+      OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --group dev
+
+      - name: Rules engine still agrees with labelled trades
+        run: uv run python -m evals.ci_gate --trades --db data/sample/warehouse_sample.duckdb
+
+      - name: Exact-answer smoke (needs the OLLAMA_API_KEY secret)
+        if: env.OLLAMA_API_KEY != ''
+        run: |
+          uv run python -m evals.runners.run_exact --config full --sample-only --limit 10
+          uv run python -m evals.ci_gate --exact-summary evals/results/exact/full_summary.json --threshold 0.7
+
+      - name: Comment results on the PR
+        if: always() && github.event_name == 'pull_request' && hashFiles('eval_report.md') != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: nba-bench
+          path: eval_report.md

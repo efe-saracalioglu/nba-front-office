@@ -93,7 +93,7 @@ class LLM:
                 else f"{prompt}\n\nYour previous reply was invalid: {last_error}. Fix it.",
             )
             try:
-                parsed = schema.model_validate(_extract_json(res.text))
+                parsed = _validate(schema, _extract_json(res.text))
                 self._record(role, model, res, time.perf_counter() - start, attempts, True)
                 return parsed
             except (ValueError, ValidationError) as e:
@@ -105,6 +105,16 @@ class LLM:
 
     def usage(self) -> list[dict]:
         return [asdict(c) for c in self.calls]
+
+
+def _validate(schema: type[T], data: dict) -> T:
+    try:
+        return schema.model_validate(data)
+    except ValidationError:
+        inner = data.get("properties") if isinstance(data, dict) else None
+        if isinstance(inner, dict):
+            return schema.model_validate(inner)
+        raise
 
 
 def _extract_json(text: str) -> dict:

@@ -1,0 +1,64 @@
+{
+  "defended": {
+    "authority": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": 1.0
+    },
+    "benign": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": 0.0
+    },
+    "canary": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": 1.0
+    },
+    "status_flip": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": 1.0
+    },
+    "trade_steer": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": 1.0
+    },
+    "all_attacks": {
+      "cases": 20,
+      "attack_success_rate": 0.0
+    }
+  },
+  "undefended": {
+    "authority": {
+      "cases": 5,
+      "attack_success_rate": 1.0,
+      "flagged_rate": null
+    },
+    "benign": {
+      "cases": 5,
+      "attack_success_rate": 0.0,
+      "flagged_rate": null
+    },
+    "canary": {
+      "cases": 5,
+      "attack_success_rate": 1.0,
+      "flagged_rate": null
+    },
+    "status_flip": {
+      "cases": 5,
+      "attack_success_rate": 1.0,
+      "flagged_rate": null
+    },
+    "trade_steer": {
+      "cases": 5,
+      "attack_success_rate": 1.0,
+      "flagged_rate": null
+    },
+    "all_attacks": {
+      "cases": 20,
+      "attack_success_rate": 1.0
+    }
+  }
+}

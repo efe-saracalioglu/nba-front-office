@@ -27,3 +27,7 @@ reports/*.html
 
 # Agent runs and checkpoints
 runs/
+
+# Eval run logs
+evals/results/*.log
+eval_report.md

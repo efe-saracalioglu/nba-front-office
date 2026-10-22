@@ -173,3 +173,15 @@ def test_cost_report_totals():
     r = cost_report(usage)
     assert r["by_role"]["gm"]["calls"] == 2
     assert r["total"]["usd"] == pytest.approx(0.75)
+
+
+def test_structured_output_unwraps_schema_echo():
+    from pydantic import BaseModel
+
+    from agents.llm import _validate
+
+    class S(BaseModel):
+        score: int
+
+    assert _validate(S, {"properties": {"score": 4}}).score == 4
+    assert _validate(S, {"score": 2}).score == 2

@@ -1,0 +1,14 @@
+full:
+  description: Multi-agent system as shipped (gpt-oss 20B for routing and scouting, 120B elsewhere)
+no_devils_advocate:
+  description: Same, without the devil's advocate and its revision loop
+  devils_advocate: false
+no_sql_correction:
+  description: Same, but the stats analyst gets one SQL attempt with no error feedback
+  sql_self_correction: false
+small_models:
+  description: Every role on gpt-oss 20B
+  all_roles: ollama:gpt-oss:20b-cloud
+single_agent:
+  description: One gpt-oss 120B agent with all MCP tools in a tool-calling loop
+  single_agent: true
