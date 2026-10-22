@@ -7,6 +7,8 @@ from typing import Any
 import anyio
 from mcp import Client
 
+from agents.tracing import observation
+
 
 class ToolCallError(RuntimeError):
     pass
@@ -37,13 +39,17 @@ class ToolBox:
 
     def call(self, name: str, **args) -> Any:
         clean = {k: v for k, v in args.items() if v is not None}
-        start = time.perf_counter()
-        result = anyio.run(self._call, name, clean)
-        self.calls.append({"tool": name, "args": clean, "seconds": round(time.perf_counter() - start, 3),
-                           "error": bool(result.is_error)})  # fmt: skip
-        if result.is_error:
-            raise ToolCallError(result.content[0].text if result.content else f"{name} failed")
-        data = result.structured_content
-        if isinstance(data, dict) and set(data) == {"result"}:
-            return data["result"]
-        return data
+        with observation(f"mcp:{name}", as_type="tool", input=clean) as span:
+            start = time.perf_counter()
+            result = anyio.run(self._call, name, clean)
+            self.calls.append({"tool": name, "args": clean, "seconds": round(time.perf_counter() - start, 3),
+                               "error": bool(result.is_error)})  # fmt: skip
+            if result.is_error:
+                message = result.content[0].text if result.content else f"{name} failed"
+                span.update(level="ERROR", status_message=message, output=message)
+                raise ToolCallError(message)
+            data = result.structured_content
+            if isinstance(data, dict) and set(data) == {"result"}:
+                data = data["result"]
+            span.update(output=data)
+            return data

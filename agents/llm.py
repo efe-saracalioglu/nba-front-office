@@ -12,6 +12,7 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from agents.providers import chat
+from agents.tracing import observation
 from data.config import ROOT
 
 MODELS_YAML = ROOT / "config" / "models.yaml"
@@ -51,10 +52,29 @@ class LLM:
         self.calls.append(Call(role, model, res.input_tokens if res else 0, res.output_tokens if res else 0,
                                round(seconds, 2), attempts, ok))  # fmt: skip
 
+    def _chat(self, role: str, model: str, system: str, user: str, json_mode: bool = True):
+        with observation(f"llm:{role}", as_type="generation", model=model,
+                         input=[{"role": "system", "content": system}, {"role": "user", "content": user}]) as gen:  # fmt: skip
+            res = chat(model, system, user, json_mode=json_mode)
+            price = (
+                _models_config()
+                .get("list_prices_per_million_tokens", {})
+                .get(model, {"input": 0.0, "output": 0.0})
+            )
+            gen.update(
+                output=res.text,
+                usage_details={"input": res.input_tokens, "output": res.output_tokens},
+                cost_details={
+                    "input": res.input_tokens * price["input"] / 1e6,
+                    "output": res.output_tokens * price["output"] / 1e6,
+                },
+            )
+            return res
+
     def text(self, role: str, system: str, user: str) -> str:
         model = self.model_for(role)
         start = time.perf_counter()
-        res = chat(model, system, user, json_mode=False)
+        res = self._chat(role, model, system, user, json_mode=False)
         self._record(role, model, res, time.perf_counter() - start, 1, True)
         return res.text.strip()
 
@@ -64,7 +84,8 @@ class LLM:
         start, attempts, res, last_error = time.perf_counter(), 0, None, ""
         while attempts <= retries:
             attempts += 1
-            res = chat(
+            res = self._chat(
+                role,
                 model,
                 system,
                 prompt

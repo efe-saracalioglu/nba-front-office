@@ -11,6 +11,7 @@ from langgraph.types import interrupt
 from agents import cap_analyst, specialists, stats_analyst
 from agents.deps import Deps
 from agents.state import FrontOfficeState
+from agents.tracing import traced_node
 from data.config import DATA_DIR
 
 CHECKPOINTS = DATA_DIR / "checkpoints.sqlite"
@@ -156,7 +157,7 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
                      ("valuation", valuation), ("scout", scout), ("cap", cap), ("devils_advocate", devils_advocate),
                      ("approval", approval), ("memo", memo), ("answer_stats", answer_stats),
                      ("answer_player", answer_player)]:  # fmt: skip
-        g.add_node(name, fn)
+        g.add_node(name, traced_node(name, fn))
     g.add_edge(START, "router")
     g.add_conditional_edges("router", after_router, {"trade_search": "gm_plan", "need_team": "need_team",
                                                      "stats_question": "answer_stats", "player_question": "answer_player"})  # fmt: skip

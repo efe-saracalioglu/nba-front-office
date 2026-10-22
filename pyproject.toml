@@ -25,6 +25,7 @@ dependencies = [
     "feedparser>=6.0.14",
     "langgraph>=1.2.16",
     "langgraph-checkpoint-sqlite>=3.1.2",
+    "langfuse>=5.0.3",
 ]
 
 [dependency-groups]

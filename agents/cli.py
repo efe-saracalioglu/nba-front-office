@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import uuid
 from datetime import UTC, datetime
@@ -10,6 +11,7 @@ from pathlib import Path
 
 from langgraph.types import Command
 
+from agents import tracing
 from agents.deps import Deps
 from agents.graph import build
 from agents.llm import cost_report
@@ -43,7 +45,12 @@ def show_proposals(payload: dict) -> None:
 def ask_approval(payload: dict, auto: bool) -> dict:
     show_proposals(payload)
     if auto or not payload.get("proposals"):
-        return {"approved": "all", "notes": "auto-approved" if auto else None}
+        dropped = {c["proposal_id"] for c in payload.get("critiques", []) if c["verdict"] == "drop"}
+        kept = [p["id"] for p in payload.get("proposals", []) if p["id"] not in dropped]
+        return {
+            "approved": kept,
+            "notes": "auto-approved: proposals the devil's advocate did not drop" if auto else None,
+        }
     raw = input("\nApprove which proposals? (e.g. P1,P3 / all / none): ").strip()
     notes = input("Notes for the memo (optional): ").strip() or None
     approved = (
@@ -97,7 +104,26 @@ def main() -> None:
     else:
         sys.exit("Give a request, or --thread of an unfinished run.")
 
-    state = run(graph, inputs, config, args.auto_approve)
+    request = args.request or existing.values.get("request", "")
+    team = args.team or existing.values.get("team") or "no-team"
+    tags = [f"team:{team}", "approval:auto" if args.auto_approve else "approval:human",
+            f"devils_advocate:{'on' if deps.devils_advocate else 'off'}"]  # fmt: skip
+    models = {
+        role: deps.llm.model_for(role)
+        for role in ("router", "gm", "stats", "scout", "devils_advocate", "memo")
+    }
+    with tracing.run_trace("front-office", thread, tags, models, request) as root:
+        state = run(graph, inputs, config, args.auto_approve)
+        trace_id = tracing.current_trace_id()
+        root.update(
+            output=state.get("memo")
+            or state.get("answer")
+            or state.get("error")
+            or "waiting for approval"
+        )
+    if trace_id:
+        host = os.environ.get("LANGFUSE_HOST", "http://localhost:3000")
+        print(f"Trace: {host}/project/front-office/traces/{trace_id}")
     if state.get("error"):
         print(f"\n{state['error']}")
     if state.get("answer"):
@@ -111,7 +137,9 @@ def main() -> None:
     RUNS.mkdir(exist_ok=True)
     out = Path(RUNS / f"{datetime.now(UTC):%Y%m%dT%H%M%S}_{thread}.json")
     out.write_text(
-        json.dumps(state | {"cost": report, "thread": thread}, indent=1, default=str),
+        json.dumps(
+            state | {"cost": report, "thread": thread, "trace_id": trace_id}, indent=1, default=str
+        ),
         encoding="utf-8",
     )
     print(f"Saved {out.relative_to(ROOT)}")
