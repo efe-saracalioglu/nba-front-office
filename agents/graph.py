@@ -23,8 +23,12 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
     def router(state: FrontOfficeState) -> dict:
         r = specialists.route(deps, state["request"])
         team = state.get("team") or r.team
-        out = {"route": r.route, "player": r.player, "team": team.upper() if team else None,
-               "trade_date": state.get("trade_date") or date.today().isoformat()}  # fmt: skip
+        out = {
+            "route": r.route,
+            "player": r.player,
+            "team": team.upper() if team else None,
+            "trade_date": state.get("trade_date") or date.today().isoformat(),
+        }
         return out | deps.flush(
             f"router: {r.route}" + (f" for {out['team']}" if out["team"] else "")
         )
@@ -35,8 +39,10 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
         return state["route"]
 
     def need_team(state: FrontOfficeState) -> dict:
-        return {"error": "Which team are you running? Pass --team (e.g. BOS) or name the team in the request.",
-                "events": ["stopped: no team"]}  # fmt: skip
+        return {
+            "error": "Which team are you running? Pass --team (e.g. BOS) or name the team in the request.",
+            "events": ["stopped: no team"],
+        }
 
     def gm_plan(state: FrontOfficeState) -> dict:
         goal = specialists.plan_goal(deps, state["request"], state["team"])
@@ -78,8 +84,12 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
                 )
                 if target:
                     extra[target] = 1
-        dropped = {p["target"] for p in state.get("proposals", [])
-                   for c in state.get("critiques", []) if c["proposal_id"] == p["id"] and c["verdict"] == "drop"}  # fmt: skip
+        dropped = {
+            p["target"]
+            for p in state.get("proposals", [])
+            for c in state.get("critiques", [])
+            if c["proposal_id"] == p["id"] and c["verdict"] == "drop"
+        }
         candidates = [c for c in state["candidates"] if c["player_name"] not in dropped]
         props, outcomes = cap_analyst.propose(
             deps, state["goal"], candidates, state.get("scouting", {}), state["trade_date"], extra
@@ -123,8 +133,13 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
                 c["proposal_id"] for c in state.get("critiques", []) if c["verdict"] == "drop"
             }
             kept = [i for i in ids if i not in dropped]
-            return {"approval": {"approved": kept, "notes": "auto-approved: proposals the devil's advocate did not drop"},
-                    "events": [f"approval: auto {kept or 'none'}"]}  # fmt: skip
+            return {
+                "approval": {
+                    "approved": kept,
+                    "notes": "auto-approved: proposals the devil's advocate did not drop",
+                },
+                "events": [f"approval: auto {kept or 'none'}"],
+            }
         decision = interrupt(
             {"proposals": state.get("proposals", []), "critiques": state.get("critiques", [])}
         )
@@ -133,8 +148,10 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
             if decision.get("approved") == "all"
             else [i for i in decision.get("approved", []) if i in ids]
         )
-        return {"approval": {"approved": approved, "notes": decision.get("notes")},
-                "events": [f"approval: {approved or 'none'}"]}  # fmt: skip
+        return {
+            "approval": {"approved": approved, "notes": decision.get("notes")},
+            "events": [f"approval: {approved or 'none'}"],
+        }
 
     def memo(state: FrontOfficeState) -> dict:
         return {"memo": specialists.write_memo(deps, state)} | deps.flush("gm: memo written")
@@ -154,14 +171,32 @@ def build(deps: Deps, checkpoint_path: Path | None = CHECKPOINTS, human_in_the_l
         } | deps.flush("gm: answered")
 
     g = StateGraph(FrontOfficeState)
-    for name, fn in [("router", router), ("need_team", need_team), ("gm_plan", gm_plan), ("stats", stats),
-                     ("valuation", valuation), ("scout", scout), ("cap", cap), ("devils_advocate", devils_advocate),
-                     ("approval", approval), ("memo", memo), ("answer_stats", answer_stats),
-                     ("answer_player", answer_player)]:  # fmt: skip
+    for name, fn in [
+        ("router", router),
+        ("need_team", need_team),
+        ("gm_plan", gm_plan),
+        ("stats", stats),
+        ("valuation", valuation),
+        ("scout", scout),
+        ("cap", cap),
+        ("devils_advocate", devils_advocate),
+        ("approval", approval),
+        ("memo", memo),
+        ("answer_stats", answer_stats),
+        ("answer_player", answer_player),
+    ]:
         g.add_node(name, traced_node(name, fn))
     g.add_edge(START, "router")
-    g.add_conditional_edges("router", after_router, {"trade_search": "gm_plan", "need_team": "need_team",
-                                                     "stats_question": "answer_stats", "player_question": "answer_player"})  # fmt: skip
+    g.add_conditional_edges(
+        "router",
+        after_router,
+        {
+            "trade_search": "gm_plan",
+            "need_team": "need_team",
+            "stats_question": "answer_stats",
+            "player_question": "answer_player",
+        },
+    )
     g.add_edge("gm_plan", "stats")
     g.add_edge("stats", "valuation")
     g.add_edge("valuation", "scout")

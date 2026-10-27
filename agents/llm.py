@@ -49,12 +49,25 @@ class LLM:
         return self.overrides.get(role) or cfg["roles"].get(role) or cfg["default"]
 
     def _record(self, role: str, model: str, res, seconds: float, attempts: int, ok: bool) -> None:
-        self.calls.append(Call(role, model, res.input_tokens if res else 0, res.output_tokens if res else 0,
-                               round(seconds, 2), attempts, ok))  # fmt: skip
+        self.calls.append(
+            Call(
+                role,
+                model,
+                res.input_tokens if res else 0,
+                res.output_tokens if res else 0,
+                round(seconds, 2),
+                attempts,
+                ok,
+            )
+        )
 
     def _chat(self, role: str, model: str, system: str, user: str, json_mode: bool = True):
-        with observation(f"llm:{role}", as_type="generation", model=model,
-                         input=[{"role": "system", "content": system}, {"role": "user", "content": user}]) as gen:  # fmt: skip
+        with observation(
+            f"llm:{role}",
+            as_type="generation",
+            model=model,
+            input=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+        ) as gen:
             res = chat(model, system, user, json_mode=json_mode)
             price = (
                 _models_config()

@@ -92,7 +92,7 @@ def evaluate(
     train: pd.DataFrame, holdout: pd.DataFrame, params: dict, interval: tuple, margin: float
 ) -> tuple[dict, pd.DataFrame]:
     y = holdout[TARGET].to_numpy()
-    ridge = baselines.ridge(FEATURES).fit(train[FEATURES], train[TARGET])
+    ridge = baselines.ridge().fit(train[FEATURES], train[TARGET])
     model = lgbm(params).fit(train[FEATURES], train[TARGET])
     preds = {
         "persistence": baselines.persistence(holdout),

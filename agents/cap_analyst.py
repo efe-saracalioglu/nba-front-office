@@ -68,9 +68,12 @@ def tradable_picks(assets: dict, protected: list[str]) -> list[dict]:
     blocked_years = {p for p in protected if p.isdigit()}
     blocked_ids = set(protected) - blocked_years
     out = [
-        a for a in assets["owned"]
-        if a["kind"] in ("own", "acquired") and str(a["year"]) not in blocked_years and a["asset_id"] not in blocked_ids
-    ]  # fmt: skip
+        a
+        for a in assets["owned"]
+        if a["kind"] in ("own", "acquired")
+        and str(a["year"]) not in blocked_years
+        and a["asset_id"] not in blocked_ids
+    ]
     return sorted(out, key=lambda a: (a["round"] == 1, -a["year"]))
 
 
@@ -97,8 +100,17 @@ def _payroll_line(cap_sheet: dict, line: str) -> int | None:
     return cap_sheet["payroll"] + cap_sheet["room_to"][LINE_KEYS[line]]
 
 
-def build_package(deps: Deps, valuer: Valuer, goal: dict, target: dict, send: list[dict], picks_pool: list[dict],
-                  trade_date: str, line_value: int | None, extra_picks: int = 0) -> dict | str:  # fmt: skip
+def build_package(
+    deps: Deps,
+    valuer: Valuer,
+    goal: dict,
+    target: dict,
+    send: list[dict],
+    picks_pool: list[dict],
+    trade_date: str,
+    line_value: int | None,
+    extra_picks: int = 0,
+) -> dict | str:
     cfg = market()
     team, other = goal["team"], target["team"]
     target_surplus = valuer.surplus(target["player_name"], other)
@@ -161,27 +173,61 @@ def build_package(deps: Deps, valuer: Valuer, goal: dict, target: dict, send: li
         return f"would push our payroll above the {goal['stay_below'].replace('_', ' ')}"
     picks_value = sum(pick_value(p) for p in chosen)
     return {
-        "target": target["player_name"], "from_team": other,
-        "send_players": [{"name": p["name"], "salary": p["salary"], "projected_ws": round(valuer.ws(p["name"], team), 2),
-                          "surplus_value": round(valuer.surplus(p["name"], team))} for p in send],
-        "send_picks": [{"asset_id": p["asset_id"], "year": p["year"], "round": p["round"], "protection": p.get("protection")} for p in chosen],
-        "receive": {"name": target["player_name"], "salary": target["salary"], "projected_ws": round(valuer.ws(target["player_name"], other), 2),
-                    "surplus_value": round(target_surplus)},
+        "target": target["player_name"],
+        "from_team": other,
+        "send_players": [
+            {
+                "name": p["name"],
+                "salary": p["salary"],
+                "projected_ws": round(valuer.ws(p["name"], team), 2),
+                "surplus_value": round(valuer.surplus(p["name"], team)),
+            }
+            for p in send
+        ],
+        "send_picks": [
+            {
+                "asset_id": p["asset_id"],
+                "year": p["year"],
+                "round": p["round"],
+                "protection": p.get("protection"),
+            }
+            for p in chosen
+        ],
+        "receive": {
+            "name": target["player_name"],
+            "salary": target["salary"],
+            "projected_ws": round(valuer.ws(target["player_name"], other), 2),
+            "surplus_value": round(target_surplus),
+        },
         "value": {
             "our_value_change": round(target_surplus - players_value - picks_value),
             "counterparty_value_change": round(players_value + picks_value - target_surplus),
-            "ws_change_for_us": round(valuer.ws(target["player_name"], other) - sum(valuer.ws(p["name"], team) for p in send), 2),
+            "ws_change_for_us": round(
+                valuer.ws(target["player_name"], other)
+                - sum(valuer.ws(p["name"], team) for p in send),
+                2,
+            ),
             "picks_value_assumed": round(picks_value),
             "first_round_picks_for_talent": firsts,
         },
-        "validation": {"valid": True, "teams": verdict["teams"], "warnings": [w["message"] for w in verdict["warnings"]]},
+        "validation": {
+            "valid": True,
+            "teams": verdict["teams"],
+            "warnings": [w["message"] for w in verdict["warnings"]],
+        },
         "legs": legs,
         "trade_date": trade_date,
-    }  # fmt: skip
+    }
 
 
-def propose(deps: Deps, goal: dict, candidates: list[dict], scouting: dict, trade_date: str,
-            extra_picks: dict[str, int] | None = None) -> tuple[list[dict], dict[str, str]]:  # fmt: skip
+def propose(
+    deps: Deps,
+    goal: dict,
+    candidates: list[dict],
+    scouting: dict,
+    trade_date: str,
+    extra_picks: dict[str, int] | None = None,
+) -> tuple[list[dict], dict[str, str]]:
     cfg = market()
     team = goal["team"]
     valuer = Valuer(deps)
@@ -201,8 +247,14 @@ def propose(deps: Deps, goal: dict, candidates: list[dict], scouting: dict, trad
             outcomes[name] = "skipped: out with a high-risk injury"
             continue
         try:
-            matches = deps.tools.call("find_salary_matches", team=team, target_player=name,
-                                      max_players=3, limit=20, trade_date=trade_date)  # fmt: skip
+            matches = deps.tools.call(
+                "find_salary_matches",
+                team=team,
+                target_player=name,
+                max_players=3,
+                limit=20,
+                trade_date=trade_date,
+            )
         except ToolCallError as e:
             outcomes[name] = f"could not be checked: {e}"
             continue
@@ -217,8 +269,17 @@ def propose(deps: Deps, goal: dict, candidates: list[dict], scouting: dict, trad
             outcomes[name] = f"no salary-matching package of up to three {team} players{suffix}"
             continue
         for pkg in packages:
-            built = build_package(deps, valuer, goal, target, pkg["send"], picks_pool, trade_date, line_value,
-                                  extra_picks.get(name, 0))  # fmt: skip
+            built = build_package(
+                deps,
+                valuer,
+                goal,
+                target,
+                pkg["send"],
+                picks_pool,
+                trade_date,
+                line_value,
+                extra_picks.get(name, 0),
+            )
             if isinstance(built, str):
                 reasons[built] += 1
                 continue

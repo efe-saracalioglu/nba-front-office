@@ -14,33 +14,38 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
         if after > limit and after > flow.state.standard_roster:
             out.append(
                 RuleViolation(
-                    code="ROSTER_MAX", team=flow.team,
+                    code="ROSTER_MAX",
+                    team=flow.team,
                     message=f"{flow.team} would carry {after} standard contracts; the limit is {limit}. It must waive or include players first.",
                     details={"after": after, "limit": limit},
                 )
-            )  # fmt: skip
+            )
         elif in_season and after < r.temporary_min_standard:
             out.append(
                 RuleViolation(
-                    code="ROSTER_MIN", team=flow.team,
+                    code="ROSTER_MIN",
+                    team=flow.team,
                     message=f"{flow.team} would drop to {after} standard contracts; the floor is {r.temporary_min_standard}.",
                     details={"after": after, "floor": r.temporary_min_standard},
                 )
-            )  # fmt: skip
+            )
         elif in_season and after < r.min_standard:
             out.append(
                 RuleViolation(
-                    code="ROSTER_BELOW_MIN", team=flow.team, severity="warning",
+                    code="ROSTER_BELOW_MIN",
+                    team=flow.team,
+                    severity="warning",
                     message=f"{flow.team} would carry {after} standard contracts and must get back to {r.min_standard} within two weeks.",
                     details={"after": after},
                 )
-            )  # fmt: skip
+            )
         if flow.two_way_after > r.max_two_way:
             out.append(
                 RuleViolation(
-                    code="TWO_WAY_MAX", team=flow.team,
+                    code="TWO_WAY_MAX",
+                    team=flow.team,
                     message=f"{flow.team} would carry {flow.two_way_after} two-way players; the limit is {r.max_two_way}.",
                     details={"after": flow.two_way_after},
                 )
-            )  # fmt: skip
+            )
     return out

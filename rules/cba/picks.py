@@ -12,11 +12,12 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
             if not d.first_tradable_year <= pick.year <= d.last_tradable_year:
                 out.append(
                     RuleViolation(
-                        code="PICK_OUT_OF_WINDOW", team=flow.team,
+                        code="PICK_OUT_OF_WINDOW",
+                        team=flow.team,
                         message=f"{pick.asset_id} is outside the tradable window {d.first_tradable_year}-{d.last_tradable_year}.",
                         details={"asset_id": pick.asset_id},
                     )
-                )  # fmt: skip
+                )
         firsts_sent = {p.year for p in flow.out_picks if p.round == 1 and p.counts_as_pick}
         if not firsts_sent:
             continue
@@ -26,10 +27,11 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
             if holdings[year] == 0 and holdings[year + 1] == 0 and firsts_sent & set(pair):
                 out.append(
                     RuleViolation(
-                        code="STEPIEN", team=flow.team,
+                        code="STEPIEN",
+                        team=flow.team,
                         message=f"{flow.team} would have no first-round pick in both {year} and {year + 1} (Stepien rule).",
                         details={"years": list(pair)},
                     )
-                )  # fmt: skip
+                )
                 break
     return out

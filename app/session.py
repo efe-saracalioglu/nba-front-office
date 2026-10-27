@@ -53,8 +53,12 @@ def _stream(graph, payload, config: dict) -> Iterator[tuple[str, Any]]:
 
 
 def step(run: Run, graph, payload) -> Iterator[str]:
-    tags = [f"team:{run.team or 'no-team'}", "approval:human", "ui:streamlit",
-            f"devils_advocate:{'on' if run.devils_advocate else 'off'}"]  # fmt: skip
+    tags = [
+        f"team:{run.team or 'no-team'}",
+        "approval:human",
+        "ui:streamlit",
+        f"devils_advocate:{'on' if run.devils_advocate else 'off'}",
+    ]
     llm = LLM()
     models = {role: llm.model_for(role) for role in ROLES}
     run.pending = None
@@ -67,8 +71,12 @@ def step(run: Run, graph, payload) -> Iterator[str]:
                 yield value
         run.state = graph.get_state(run.config).values
         trace_id = tracing.current_trace_id()
-        root.update(output=run.state.get("memo") or run.state.get("answer")
-                    or run.state.get("error") or "waiting for approval")  # fmt: skip
+        root.update(
+            output=run.state.get("memo")
+            or run.state.get("answer")
+            or run.state.get("error")
+            or "waiting for approval"
+        )
     if trace_id:
         run.trace_ids.append(trace_id)
 
@@ -88,8 +96,14 @@ def load(thread: str, graph, devils_advocate: bool = True) -> Run | None:
     if not snap.values:
         return None
     values = snap.values
-    run = Run(thread=thread, devils_advocate=devils_advocate, request=values.get("request", ""),
-              team=values.get("team"), events=list(values.get("events", [])), state=values)  # fmt: skip
+    run = Run(
+        thread=thread,
+        devils_advocate=devils_advocate,
+        request=values.get("request", ""),
+        team=values.get("team"),
+        events=list(values.get("events", [])),
+        state=values,
+    )
     if snap.interrupts:
         run.pending = snap.interrupts[0].value
     return run

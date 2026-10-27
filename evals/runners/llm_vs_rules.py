@@ -14,10 +14,22 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "nba_bench" / "trades.jsonl"
 RESULTS = ROOT / "results"
 CODES = [
-    "SALARY_MATCHING", "SALARY_MATCHING_APRON", "ABSORB_WITHOUT_ROOM", "SECOND_APRON_AGGREGATION",
-    "SECOND_APRON_CASH", "ROSTER_MAX", "ROSTER_MIN", "TWO_WAY_MAX", "STEPIEN", "PICK_OUT_OF_WINDOW",
-    "PICK_NOT_OWNED", "RECENTLY_SIGNED", "AGGREGATION_TOO_SOON", "CASH_LIMIT", "TRADE_DEADLINE_PASSED",
-]  # fmt: skip
+    "SALARY_MATCHING",
+    "SALARY_MATCHING_APRON",
+    "ABSORB_WITHOUT_ROOM",
+    "SECOND_APRON_AGGREGATION",
+    "SECOND_APRON_CASH",
+    "ROSTER_MAX",
+    "ROSTER_MIN",
+    "TWO_WAY_MAX",
+    "STEPIEN",
+    "PICK_OUT_OF_WINDOW",
+    "PICK_NOT_OWNED",
+    "RECENTLY_SIGNED",
+    "AGGREGATION_TOO_SOON",
+    "CASH_LIMIT",
+    "TRADE_DEADLINE_PASSED",
+]
 
 SYSTEM = """You are an NBA salary cap expert checking whether a proposed trade is legal under the 2023 CBA.
 Apply exactly these rules, using the numbers given in the case. All money is in US dollars.
@@ -88,9 +100,14 @@ def run(model: str, cases: list[dict], out_path: Path) -> list[dict]:
                 continue
             res = chat(model, SYSTEM, render_case(case))
             row = {
-                "id": case["id"], "bucket": case["bucket"], "raw": res.text, "parsed": parse(res.text),
-                "input_tokens": res.input_tokens, "output_tokens": res.output_tokens, "seconds": round(res.seconds, 2),
-            }  # fmt: skip
+                "id": case["id"],
+                "bucket": case["bucket"],
+                "raw": res.text,
+                "parsed": parse(res.text),
+                "input_tokens": res.input_tokens,
+                "output_tokens": res.output_tokens,
+                "seconds": round(res.seconds, 2),
+            }
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
             f.flush()
             done[case["id"]] = row

@@ -35,18 +35,24 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
             if eligible and day < eligible:
                 out.append(
                     RuleViolation(
-                        code="RECENTLY_SIGNED", team=flow.team,
+                        code="RECENTLY_SIGNED",
+                        team=flow.team,
                         message=f"{p.name} signed on {p.signed_on} and cannot be traded until {eligible}.",
-                        details={"player_id": p.player_id, "signed_on": str(p.signed_on), "eligible": str(eligible)},
+                        details={
+                            "player_id": p.player_id,
+                            "signed_on": str(p.signed_on),
+                            "eligible": str(eligible),
+                        },
                     )
-                )  # fmt: skip
+                )
             acquired = p.acquired_by_trade_on
             if flow.aggregates and acquired and day < acquired + wait:
                 out.append(
                     RuleViolation(
-                        code="AGGREGATION_TOO_SOON", team=flow.team,
+                        code="AGGREGATION_TOO_SOON",
+                        team=flow.team,
                         message=f"{p.name} was acquired by trade on {acquired} and cannot be combined with other salaries until {acquired + wait}.",
                         details={"player_id": p.player_id, "acquired": str(acquired)},
                     )
-                )  # fmt: skip
+                )
     return out

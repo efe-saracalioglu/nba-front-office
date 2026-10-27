@@ -21,17 +21,19 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
         if flow.aggregates:
             out.append(
                 RuleViolation(
-                    code="SECOND_APRON_AGGREGATION", team=flow.team,
+                    code="SECOND_APRON_AGGREGATION",
+                    team=flow.team,
                     message=f"{flow.team} would finish above the second apron (${flow.payroll_after:,}) and cannot combine the salaries of {flow.salaried_out_count} players in one trade.",
                     details={"payroll_after": flow.payroll_after, "second_apron": second},
                 )
-            )  # fmt: skip
+            )
         if flow.cash_sent > 0:
             out.append(
                 RuleViolation(
-                    code="SECOND_APRON_CASH", team=flow.team,
+                    code="SECOND_APRON_CASH",
+                    team=flow.team,
                     message=f"{flow.team} would finish above the second apron (${flow.payroll_after:,}) and cannot send cash in a trade.",
                     details={"payroll_after": flow.payroll_after, "cash_sent": flow.cash_sent},
                 )
-            )  # fmt: skip
+            )
     return out

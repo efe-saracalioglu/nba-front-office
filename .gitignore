@@ -31,3 +31,9 @@ runs/
 # Eval run logs
 evals/results/*.log
 eval_report.md
+
+# Generated labelling files
+evals/human_labels/items.json
+evals/human_labels/label_form.html
+evals/human_labels/labels.json
+evals/human_labels/agreement.json

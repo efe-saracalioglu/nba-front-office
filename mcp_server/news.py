@@ -52,10 +52,15 @@ def _fetch_articles() -> list[dict]:
     resp.raise_for_status()
     feed = feedparser.parse(resp.text)
     return [
-        {"title": e.get("title", ""), "summary": e.get("summary", ""), "url": e.get("link", ""),
-         "published": e.get("published", ""), "source": "ESPN"}
+        {
+            "title": e.get("title", ""),
+            "summary": e.get("summary", ""),
+            "url": e.get("link", ""),
+            "published": e.get("published", ""),
+            "source": "ESPN",
+        }
         for e in feed.entries
-    ]  # fmt: skip
+    ]
 
 
 def _fetch_injuries() -> list[dict]:
@@ -65,15 +70,17 @@ def _fetch_injuries() -> list[dict]:
     for team in resp.json().get("injuries", []):
         for inj in team.get("injuries", []):
             athlete = inj.get("athlete", {})
-            out.append({
-                "player_name": athlete.get("displayName", ""),
-                "team": team.get("displayName", ""),
-                "status": inj.get("status", ""),
-                "date": inj.get("date", ""),
-                "comment": inj.get("shortComment", ""),
-                "detail": inj.get("longComment", ""),
-                "source": "ESPN",
-            })  # fmt: skip
+            out.append(
+                {
+                    "player_name": athlete.get("displayName", ""),
+                    "team": team.get("displayName", ""),
+                    "status": inj.get("status", ""),
+                    "date": inj.get("date", ""),
+                    "comment": inj.get("shortComment", ""),
+                    "detail": inj.get("longComment", ""),
+                    "source": "ESPN",
+                }
+            )
     return out
 
 
@@ -120,8 +127,15 @@ def injuries_frame(roster: pd.DataFrame) -> pd.DataFrame:
         if pid is None:
             continue
         day = (i.get("date") or "")[:10] or datetime.now(UTC).date().isoformat()
-        rows.append({"player_id": pid, "report_date": day, "status": i["status"],
-                     "description": i.get("comment") or i.get("detail"), "source": i["source"]})  # fmt: skip
+        rows.append(
+            {
+                "player_id": pid,
+                "report_date": day,
+                "status": i["status"],
+                "description": i.get("comment") or i.get("detail"),
+                "source": i["source"],
+            }
+        )
     df = pd.DataFrame(rows, columns=["player_id", "report_date", "status", "description", "source"])
     return df.drop_duplicates(["player_id", "report_date"])
 

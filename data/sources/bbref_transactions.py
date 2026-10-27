@@ -85,13 +85,20 @@ def parse_trade(text_marked: str, plain: str, trade_key: str, day: date) -> list
             )
             out.append(
                 PickTransfer(
-                    trade_key=trade_key, date=day, year=key[0], round=key[1],
-                    from_team=giver, to_team=receiver,
+                    trade_key=trade_key,
+                    date=day,
+                    year=key[0],
+                    round=key[1],
+                    from_team=giver,
+                    to_team=receiver,
                     original_team=simple.group(1) if simple and not is_complex else None,
-                    annotation=ann, complex=is_complex, text=plain,
-                    note=residual if loose_protection else None, picks_in_trade=n_picks,
+                    annotation=ann,
+                    complex=is_complex,
+                    text=plain,
+                    note=residual if loose_protection else None,
+                    picks_in_trade=n_picks,
                 )
-            )  # fmt: skip
+            )
     return out
 
 

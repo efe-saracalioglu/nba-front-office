@@ -8,9 +8,23 @@ MIN_MINUTES = 250
 SEASON_GAMES = 82
 
 RATE_STATS = [
-    "per", "ts_pct", "fg3a_rate", "fta_rate", "orb_pct", "drb_pct", "trb_pct", "ast_pct",
-    "stl_pct", "blk_pct", "tov_pct", "usg_pct", "ws_per_48", "obpm", "dbpm", "bpm",
-]  # fmt: skip
+    "per",
+    "ts_pct",
+    "fg3a_rate",
+    "fta_rate",
+    "orb_pct",
+    "drb_pct",
+    "trb_pct",
+    "ast_pct",
+    "stl_pct",
+    "blk_pct",
+    "tov_pct",
+    "usg_pct",
+    "ws_per_48",
+    "obpm",
+    "dbpm",
+    "bpm",
+]
 LAG_STATS = [
     "ws_82",
     "ws_per_48",

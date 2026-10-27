@@ -26,8 +26,17 @@ List at most three proposals, each one you validated. For other questions, answe
 async def _list_tools(server) -> list[dict]:
     async with Client(server) as c:
         listed = await c.list_tools()
-    return [{"type": "function", "function": {"name": t.name, "description": t.description or "",
-                                              "parameters": t.input_schema}} for t in listed.tools]  # fmt: skip
+    return [
+        {
+            "type": "function",
+            "function": {
+                "name": t.name,
+                "description": t.description or "",
+                "parameters": t.input_schema,
+            },
+        }
+        for t in listed.tools
+    ]
 
 
 def _ollama_chat(model: str, messages: list[dict], tools: list[dict]) -> dict:
@@ -61,8 +70,14 @@ def extract_proposals(text: str) -> list[dict]:
         return []
 
 
-def run_single_agent(request: str, team: str | None, trade_date: str, tags: list[str], session: str,
-                     model_role: str = "single_agent") -> dict:  # fmt: skip
+def run_single_agent(
+    request: str,
+    team: str | None,
+    trade_date: str,
+    tags: list[str],
+    session: str,
+    model_role: str = "single_agent",
+) -> dict:
     llm = LLM()
     model_spec = llm.model_for(model_role)
     model = model_spec.partition(":")[2]
@@ -102,8 +117,17 @@ def run_single_agent(request: str, team: str | None, trade_date: str, tags: list
                             "output": reply.get("eval_count", 0),
                         },
                     )
-                llm.calls.append(Call("single_agent", model_spec, reply.get("prompt_eval_count", 0), reply.get("eval_count", 0),
-                                      round(time.perf_counter() - t0, 2), 1, True))  # fmt: skip
+                llm.calls.append(
+                    Call(
+                        "single_agent",
+                        model_spec,
+                        reply.get("prompt_eval_count", 0),
+                        reply.get("eval_count", 0),
+                        round(time.perf_counter() - t0, 2),
+                        1,
+                        True,
+                    )
+                )
                 messages.append(
                     {
                         "role": "assistant",
@@ -134,7 +158,13 @@ def run_single_agent(request: str, team: str | None, trade_date: str, tags: list
         trace_id = tracing.current_trace_id()
         root.update(output=answer or error)
     return {
-        "answer": answer, "proposals_raw": extract_proposals(answer), "error": error, "trace_id": trace_id,
-        "seconds": round(time.perf_counter() - start, 1), "cost": cost_report(llm.usage())["total"],
-        "tool_calls": len(tools.calls), "steps": steps, "route": "single_agent",
-    }  # fmt: skip
+        "answer": answer,
+        "proposals_raw": extract_proposals(answer),
+        "error": error,
+        "trace_id": trace_id,
+        "seconds": round(time.perf_counter() - start, 1),
+        "cost": cost_report(llm.usage())["total"],
+        "tool_calls": len(tools.calls),
+        "steps": steps,
+        "route": "single_agent",
+    }

@@ -12,9 +12,10 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
             if amount > limit:
                 out.append(
                     RuleViolation(
-                        code="CASH_LIMIT", team=flow.team,
+                        code="CASH_LIMIT",
+                        team=flow.team,
                         message=f"{flow.team} would {direction} ${amount:,} in cash; the season limit is ${limit:,}.",
                         details={"amount": amount, "limit": limit, "direction": direction},
                     )
-                )  # fmt: skip
+                )
     return out

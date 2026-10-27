@@ -50,8 +50,10 @@ def test_thread_can_be_reloaded_at_the_approval_step(sample_db, tmp_path):
 
 
 def test_dropped_proposals_are_not_preselected():
-    pending = {"proposals": [{"id": "P1"}, {"id": "P2"}],
-               "critiques": [{"proposal_id": "P2", "verdict": "drop"}]}  # fmt: skip
+    pending = {
+        "proposals": [{"id": "P1"}, {"id": "P2"}],
+        "critiques": [{"proposal_id": "P2", "verdict": "drop"}],
+    }
     assert session.default_selection(pending) == ["P1"]
 
 

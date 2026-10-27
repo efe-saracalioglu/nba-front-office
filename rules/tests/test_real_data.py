@@ -46,12 +46,15 @@ def test_payroll_matches_contracts_table(lg):
 def test_jokic_for_curry_breaks_denver_apron_matching(lg):
     jok, cur = _player(lg, "Nikola Jokić"), _player(lg, "Stephen Curry")
     v = validate_trade(
-        Trade(trade_date=DAY, legs=[
-            TradeLeg(from_team=jok.team, to_team=cur.team, players=[jok.player_id]),
-            TradeLeg(from_team=cur.team, to_team=jok.team, players=[cur.player_id]),
-        ]),
+        Trade(
+            trade_date=DAY,
+            legs=[
+                TradeLeg(from_team=jok.team, to_team=cur.team, players=[jok.player_id]),
+                TradeLeg(from_team=cur.team, to_team=jok.team, players=[cur.player_id]),
+            ],
+        ),
         lg,
-    )  # fmt: skip
+    )
     assert not v.valid
     assert [x.code for x in v.violations] == ["SALARY_MATCHING_APRON"]
     assert v.violations[0].team == jok.team
@@ -63,10 +66,15 @@ def test_every_team_can_swap_a_pick_for_a_pick(lg):
         give = next(x.asset_id for x in lg.picks.values() if x.owner == a and x.round == 2)
         take = next(x.asset_id for x in lg.picks.values() if x.owner == b and x.round == 2)
         v = validate_trade(
-            Trade(trade_date=DAY, legs=[TradeLeg(from_team=a, to_team=b, picks=[give]),
-                                        TradeLeg(from_team=b, to_team=a, picks=[take])]),
+            Trade(
+                trade_date=DAY,
+                legs=[
+                    TradeLeg(from_team=a, to_team=b, picks=[give]),
+                    TradeLeg(from_team=b, to_team=a, picks=[take]),
+                ],
+            ),
             lg,
-        )  # fmt: skip
+        )
         assert v.valid, (a, b, v.explain())
 
 

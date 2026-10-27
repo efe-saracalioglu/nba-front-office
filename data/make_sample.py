@@ -6,8 +6,14 @@ from pathlib import Path
 from data import config, db
 
 FULL_TABLES = [
-    "teams", "players", "rosters", "contracts", "draft_picks", "injuries", "player_projections",
-]  # fmt: skip
+    "teams",
+    "players",
+    "rosters",
+    "contracts",
+    "draft_picks",
+    "injuries",
+    "player_projections",
+]
 SEASON_TABLES = ["player_season_stats", "player_season_advanced", "team_season_stats"]
 
 
@@ -30,8 +36,10 @@ def make_sample(src: Path, dst: Path, n_seasons: int, n_log_seasons: int) -> Non
     for t in SEASON_TABLES:
         con.execute(f"INSERT INTO {t} SELECT * FROM src.{t} WHERE season IN ({keep})")
     if keep_logs:
-        con.execute(f"INSERT INTO player_game_logs SELECT * FROM src.player_game_logs "
-                    f"WHERE season IN ({keep_logs})")  # fmt: skip
+        con.execute(
+            f"INSERT INTO player_game_logs SELECT * FROM src.player_game_logs "
+            f"WHERE season IN ({keep_logs})"
+        )
         con.execute(f"""INSERT INTO pbp_events SELECT * FROM src.pbp_events WHERE game_id IN (
             SELECT DISTINCT game_id FROM src.player_game_logs WHERE season = '{seasons[0]}'
               AND game_date < (SELECT min(game_date) + 30 FROM src.player_game_logs

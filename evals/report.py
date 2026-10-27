@@ -25,14 +25,32 @@ COLORS = {
     "small_models": "#eda100",
     "no_sql_correction": "#6250d6",
 }
-LABELS = {"fixed": "Multi-agent v2 (after fixes)", "full": "Multi-agent v1", "single_agent": "Single agent", "no_devils_advocate": "No devil's advocate",
-          "small_models": "All 20B models", "no_sql_correction": "No SQL self-correction"}  # fmt: skip
+LABELS = {
+    "fixed": "Multi-agent v2 (after fixes)",
+    "full": "Multi-agent v1",
+    "single_agent": "Single agent",
+    "no_devils_advocate": "No devil's advocate",
+    "small_models": "All 20B models",
+    "no_sql_correction": "No SQL self-correction",
+}
 
-plt.rcParams.update({
-    "figure.dpi": 120, "axes.spines.top": False, "axes.spines.right": False, "axes.edgecolor": BASE,
-    "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED, "axes.grid": True, "grid.color": GRID,
-    "axes.axisbelow": True, "font.size": 10, "axes.titleweight": "bold", "axes.titlesize": 11,
-})  # fmt: skip
+plt.rcParams.update(
+    {
+        "figure.dpi": 120,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.edgecolor": BASE,
+        "axes.labelcolor": INK,
+        "xtick.color": MUTED,
+        "ytick.color": MUTED,
+        "axes.grid": True,
+        "grid.color": GRID,
+        "axes.axisbelow": True,
+        "font.size": 10,
+        "axes.titleweight": "bold",
+        "axes.titlesize": 11,
+    }
+)
 
 
 def _load(path: Path) -> dict | None:
@@ -100,8 +118,12 @@ def fig_scenarios(sc: dict) -> list[str]:
         ax.annotate(
             LABELS[c], (x, y), textcoords="offset points", xytext=(8, 4), fontsize=9, color=INK
         )
-    ax.set(xlabel="List-price cost per request (USD, thousandths)", ylabel="Judge overall score (1-5)",
-           title="Quality vs cost per trade request", ylim=(0.8, 5.2))  # fmt: skip
+    ax.set(
+        xlabel="List-price cost per request (USD, thousandths)",
+        ylabel="Judge overall score (1-5)",
+        title="Quality vs cost per trade request",
+        ylim=(0.8, 5.2),
+    )
     ax.set_xlim(left=0)
     fig.tight_layout()
     fig.savefig(FIG / "quality_vs_cost.png", bbox_inches="tight")
@@ -188,8 +210,13 @@ def markdown(
 ) -> str:
     lines = ["# NBA-Bench results", ""]
     if lv:
-        lines += ["## Rules engine vs LLMs (100 trades)", "", "| Judge | Exact | Verdict right | Approves illegal trades | Rejects legal trades | Seconds |", "|---|---|---|---|---|---|",
-                  "| Rules engine | 100% | 100% | 0% | 0% | <0.001 |"]  # fmt: skip
+        lines += [
+            "## Rules engine vs LLMs (100 trades)",
+            "",
+            "| Judge | Exact | Verdict right | Approves illegal trades | Rejects legal trades | Seconds |",
+            "|---|---|---|---|---|---|",
+            "| Rules engine | 100% | 100% | 0% | 0% | <0.001 |",
+        ]
         for m, s in lv.items():
             lines.append(
                 f"| {m} | {s['exact_match']:.0%} | {s['verdict_accuracy']:.0%} | {s['false_valid_rate']:.1%} | {s['false_invalid_rate']:.1%} | {s['avg_seconds']} |"
@@ -210,14 +237,20 @@ def markdown(
             )
         lines.append("")
     if sc:
-        lines += ["## Open-ended trade scenarios", "",
-                  "Ablation rows (v1 and its variants) share one system version; v2 is the shipped system after the fixes below.", "",
-                  "| Config | Judge overall | Goal fit | Realism | Grounding | Risk | Proposals legal | Pass every check | Avg seconds | Avg tokens | $ / request |",
-                  "|---|---|---|---|---|---|---|---|---|---|---|"]  # fmt: skip
+        lines += [
+            "## Open-ended trade scenarios",
+            "",
+            "Ablation rows (v1 and its variants) share one system version; v2 is the shipped system after the fixes below.",
+            "",
+            "| Config | Judge overall | Goal fit | Realism | Grounding | Risk | Proposals legal | Pass every check | Avg seconds | Avg tokens | $ / request |",
+            "|---|---|---|---|---|---|---|---|---|---|---|",
+        ]
         for c, s in sc.items():
             j = s["judge_mean"]
-            lines.append(f"| {LABELS.get(c, c)} | {j['overall']:.2f} | {j['goal_fit']:.2f} | {j['realism']:.2f} | {j['grounding']:.2f} | {j['risk_awareness']:.2f} | "
-                         f"{s['proposal_legal_rate']:.0%} | {s['proposal_pass_all_rate']:.0%} | {s['avg_seconds']} | {s['avg_tokens']:,} | {s['avg_usd_list_price']:.4f} |")  # fmt: skip
+            lines.append(
+                f"| {LABELS.get(c, c)} | {j['overall']:.2f} | {j['goal_fit']:.2f} | {j['realism']:.2f} | {j['grounding']:.2f} | {j['risk_awareness']:.2f} | "
+                f"{s['proposal_legal_rate']:.0%} | {s['proposal_pass_all_rate']:.0%} | {s['avg_seconds']} | {s['avg_tokens']:,} | {s['avg_usd_list_price']:.4f} |"
+            )
         lines.append("")
     if inj:
         lines += [
@@ -235,11 +268,20 @@ def markdown(
         lines.append("")
     if jv:
         g = jv["groups"]
-        names = {"empty_or_error": "Empty reply or crash", "no_trade_reply": "No trade proposed",
-                 "all_pass": "Every proposal passes every check", "some_fail": "Some proposal fails a check"}  # fmt: skip
-        lines += ["## Judge checked against deterministic checks", "",
-                  f"All {jv['replies']} scenario replies, grouped by what the rules engine and constraint checks found.", "",
-                  "| Group | n | Goal fit | Realism | Grounding | Risk | Overall |", "|---|---|---|---|---|---|---|"]  # fmt: skip
+        names = {
+            "empty_or_error": "Empty reply or crash",
+            "no_trade_reply": "No trade proposed",
+            "all_pass": "Every proposal passes every check",
+            "some_fail": "Some proposal fails a check",
+        }
+        lines += [
+            "## Judge checked against deterministic checks",
+            "",
+            f"All {jv['replies']} scenario replies, grouped by what the rules engine and constraint checks found.",
+            "",
+            "| Group | n | Goal fit | Realism | Grounding | Risk | Overall |",
+            "|---|---|---|---|---|---|---|",
+        ]
         for k, label in names.items():
             if k in g:
                 v = g[k]
@@ -247,8 +289,12 @@ def markdown(
                     f"| {label} | {v['n']} | {v['goal_fit']:.2f} | {v['realism']:.2f} | {v['grounding']:.2f} | {v['risk_awareness']:.2f} | {v['overall']:.2f} |"
                 )
         a = jv["auc_all_pass_vs_some_fail"]
-        lines += ["", f"Empty replies scored 1: {jv['empty_scored_1']:.0%}. Probability the judge ranks a fully passing reply above one with a failing proposal (AUC): "
-                  f"overall {a['overall']}, goal fit {a['goal_fit']}, grounding {a['grounding']}.", ""]  # fmt: skip
+        lines += [
+            "",
+            f"Empty replies scored 1: {jv['empty_scored_1']:.0%}. Probability the judge ranks a fully passing reply above one with a failing proposal (AUC): "
+            f"overall {a['overall']}, goal fit {a['goal_fit']}, grounding {a['grounding']}.",
+            "",
+        ]
     if agree:
         lines += [
             "## Judge vs human labels",
@@ -273,9 +319,13 @@ def paired(before: list[float], after: list[float], seed: int = 0) -> dict:
     rng = random.Random(seed)
     boots = sorted(statistics.mean(rng.choices(diff, k=len(diff))) for _ in range(10_000))
     nonzero = [d for d in diff if d]
-    return {"mean_diff": round(statistics.mean(diff), 2), "ci95": [round(boots[249], 2), round(boots[9749], 2)],
-            "p": round(float(wilcoxon(nonzero).pvalue), 3) if len(nonzero) > 1 else None,
-            "up": sum(d > 0 for d in diff), "down": sum(d < 0 for d in diff)}  # fmt: skip
+    return {
+        "mean_diff": round(statistics.mean(diff), 2),
+        "ci95": [round(boots[249], 2), round(boots[9749], 2)],
+        "p": round(float(wilcoxon(nonzero).pvalue), 3) if len(nonzero) > 1 else None,
+        "up": sum(d > 0 for d in diff),
+        "down": sum(d < 0 for d in diff),
+    }
 
 
 def before_after() -> dict | None:
@@ -291,26 +341,42 @@ def before_after() -> dict | None:
     broke = sum(ex_b[i]["correct"] and not ex_a[i]["correct"] for i in ex_a if i in ex_b)
     ids = sorted(set(sc_b) & set(sc_a))
     return {
-        "exact": {"before": _load(old / "exact" / "full_summary.json")["accuracy"],
-                  "after": _load(RESULTS / "exact" / "full_summary.json")["accuracy"],
-                  "fixed": fixed, "broke": broke,
-                  "mcnemar_p": round(float(binomtest(broke, fixed + broke, 0.5).pvalue), 4) if fixed + broke else None},
-        "scenarios": {d: paired([sc_b[i]["judge"][d] for i in ids], [sc_a[i]["judge"][d] for i in ids])
-                      for d in ("overall", "goal_fit", "realism", "grounding", "risk_awareness")},
-        "pass_all": [_load(old / "scenarios" / "full_summary.json")["proposal_pass_all_rate"],
-                     _load(RESULTS / "scenarios" / "full_summary.json")["proposal_pass_all_rate"]],
+        "exact": {
+            "before": _load(old / "exact" / "full_summary.json")["accuracy"],
+            "after": _load(RESULTS / "exact" / "full_summary.json")["accuracy"],
+            "fixed": fixed,
+            "broke": broke,
+            "mcnemar_p": round(float(binomtest(broke, fixed + broke, 0.5).pvalue), 4)
+            if fixed + broke
+            else None,
+        },
+        "scenarios": {
+            d: paired([sc_b[i]["judge"][d] for i in ids], [sc_a[i]["judge"][d] for i in ids])
+            for d in ("overall", "goal_fit", "realism", "grounding", "risk_awareness")
+        },
+        "pass_all": [
+            _load(old / "scenarios" / "full_summary.json")["proposal_pass_all_rate"],
+            _load(RESULTS / "scenarios" / "full_summary.json")["proposal_pass_all_rate"],
+        ],
         "n_scenarios": len(ids),
-    }  # fmt: skip
+    }
 
 
 def before_after_markdown(ba: dict) -> list[str]:
     e = ba["exact"]
-    lines = ["## System fixes: before vs after", "",
-             "Fixes: factual one-player questions routed to the SQL analyst with their own prompt, a salary ceiling for backup and cheap targets, "
-             "first-round picks required for the talent a counterparty gives up, and unambiguous payroll and hard-cap lines in the memo fact sheet.", "",
-             f"Exact answers: {e['before']:.1%} -> {e['after']:.1%} ({e['fixed']} questions fixed, {e['broke']} broken; exact McNemar p = {e['mcnemar_p']}).", "",
-             f"Scenarios, paired over {ba['n_scenarios']} requests, one run each; proposals passing every check {ba['pass_all'][0]:.0%} -> {ba['pass_all'][1]:.0%}:", "",
-             "| Judge dimension | Mean change | 95% bootstrap CI | Wilcoxon p | Better / worse |", "|---|---|---|---|---|"]  # fmt: skip
+    lines = [
+        "## System fixes: before vs after",
+        "",
+        "Fixes: factual one-player questions routed to the SQL analyst with their own prompt, a salary ceiling for backup and cheap targets, "
+        "first-round picks required for the talent a counterparty gives up, and unambiguous payroll and hard-cap lines in the memo fact sheet.",
+        "",
+        f"Exact answers: {e['before']:.1%} -> {e['after']:.1%} ({e['fixed']} questions fixed, {e['broke']} broken; exact McNemar p = {e['mcnemar_p']}).",
+        "",
+        f"Scenarios, paired over {ba['n_scenarios']} requests, one run each; proposals passing every check {ba['pass_all'][0]:.0%} -> {ba['pass_all'][1]:.0%}:",
+        "",
+        "| Judge dimension | Mean change | 95% bootstrap CI | Wilcoxon p | Better / worse |",
+        "|---|---|---|---|---|",
+    ]
     for d, s in ba["scenarios"].items():
         lines.append(
             f"| {d.replace('_', ' ')} | {s['mean_diff']:+.2f} | [{s['ci95'][0]:+.2f}, {s['ci95'][1]:+.2f}] | {s['p']} | {s['up']} / {s['down']} |"

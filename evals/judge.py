@@ -33,11 +33,17 @@ class Scores(BaseModel):
 def judge(scenario: dict, reply: str, checked: list[dict], llm: LLM | None = None) -> dict:
     llm = llm or LLM()
     facts = [
-        {"proposal": i + 1, "legal": c["legal"], "rule_violations": c["violations"], "failed_checks": c["failed_checks"],
-         "incoming_players_true_facts": c.get("incoming"), "value_balance": c.get("value"),
-         "our_payroll_before_after": c.get("payroll_before_after")}
+        {
+            "proposal": i + 1,
+            "legal": c["legal"],
+            "rule_violations": c["violations"],
+            "failed_checks": c["failed_checks"],
+            "incoming_players_true_facts": c.get("incoming"),
+            "value_balance": c.get("value"),
+            "our_payroll_before_after": c.get("payroll_before_after"),
+        }
         for i, c in enumerate(checked)
-    ]  # fmt: skip
+    ]
     user = (
         f"Owner's team: {scenario['team']}\nOwner's request: {scenario['request']}\n"
         f"Constraints to check: {json.dumps(scenario['checks'])}\n\n"

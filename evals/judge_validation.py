@@ -48,8 +48,9 @@ def validate(data: list[dict]) -> dict:
     empty = [r for r in data if r["group"] == "empty_or_error"]
     with_props = [r for r in data if r["group"] in ("all_pass", "some_fail")]
     pass_share = [statistics.mean(c["passes_all"] for c in r["checked"]) for r in with_props]
-    fails_improves = [r for r in with_props
-                      if any("improves_us" in c["failed_checks"] for c in r["checked"])]  # fmt: skip
+    fails_improves = [
+        r for r in with_props if any("improves_us" in c["failed_checks"] for c in r["checked"])
+    ]
     return {
         "replies": len(data),
         "groups": groups,

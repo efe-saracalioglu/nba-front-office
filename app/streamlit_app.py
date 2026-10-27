@@ -36,10 +36,22 @@ AGENTS = {
     "approval": ("✅", "You"),
     "stopped": ("⛔", "Stopped"),
 }
-STATUS = {"under_cap": "Under the cap", "over_cap": "Over the cap", "over_tax": "Over the tax",
-          "over_first_apron": "Over the 1st apron", "over_second_apron": "Over the 2nd apron"}  # fmt: skip
-ROLE_LABELS = {"router": "Router", "gm": "GM", "stats": "Stats analyst", "scout": "Scout",
-               "devils_advocate": "Devil's advocate", "memo": "Memo writer", "single_agent": "Single agent"}  # fmt: skip
+STATUS = {
+    "under_cap": "Under the cap",
+    "over_cap": "Over the cap",
+    "over_tax": "Over the tax",
+    "over_first_apron": "Over the 1st apron",
+    "over_second_apron": "Over the 2nd apron",
+}
+ROLE_LABELS = {
+    "router": "Router",
+    "gm": "GM",
+    "stats": "Stats analyst",
+    "scout": "Scout",
+    "devils_advocate": "Devil's advocate",
+    "memo": "Memo writer",
+    "single_agent": "Single agent",
+}
 SEVERITY = {"high": "🔴", "medium": "🟠", "low": "🟡"}
 VERDICT = {"keep": ("Keep", "green"), "revise": ("Revise", "orange"), "drop": ("Drop", "red")}
 
@@ -84,8 +96,13 @@ def sidebar() -> tuple[str | None, str, bool]:
             format_func=lambda a: "Let the router infer it" if a is None else f"{names[a]} ({a})",
             index=list(names).index("BOS") + 1 if "BOS" in names else 0,
         )
-        trade_date = st.date_input("Trade date", value=date.today(), min_value=date(2026, 7, 1),
-                                   max_value=date(2027, 6, 30), help="Rules such as the trade deadline and recently-signed players depend on it.")  # fmt: skip
+        trade_date = st.date_input(
+            "Trade date",
+            value=date.today(),
+            min_value=date(2026, 7, 1),
+            max_value=date(2027, 6, 30),
+            help="Rules such as the trade deadline and recently-signed players depend on it.",
+        )
         devils = st.toggle(
             "Devil's advocate review",
             value=True,
@@ -306,15 +323,25 @@ def cost_panel(state: dict, run: Run) -> None:
     c[3].metric("At list prices", f"${t['usd']:.4f}")
     roles = pd.DataFrame(
         [
-            {"Agent": ROLE_LABELS.get(r, r), "Calls": v["calls"], "Input tokens": v["input_tokens"],
-             "Output tokens": v["output_tokens"], "Seconds": v["seconds"], "USD": v["usd"]}
+            {
+                "Agent": ROLE_LABELS.get(r, r),
+                "Calls": v["calls"],
+                "Input tokens": v["input_tokens"],
+                "Output tokens": v["output_tokens"],
+                "Seconds": v["seconds"],
+                "USD": v["usd"],
+            }
             for r, v in report["by_role"].items()
         ]
-    )  # fmt: skip
+    )
     if not roles.empty:
         st.bar_chart(roles, x="Agent", y="Seconds", horizontal=True, height=220)
-        st.dataframe(roles, hide_index=True, width="stretch",
-                     column_config={"USD": st.column_config.NumberColumn(format="$%.5f")})  # fmt: skip
+        st.dataframe(
+            roles,
+            hide_index=True,
+            width="stretch",
+            column_config={"USD": st.column_config.NumberColumn(format="$%.5f")},
+        )
     calls = state.get("tool_calls", [])
     if calls:
         tools = (
@@ -350,8 +377,12 @@ def result(run: Run) -> None:
         text = state.get("memo") or state.get("answer") or ""
         if text:
             st.markdown(text)
-            st.download_button("Download memo (Markdown)", text, file_name=f"front-office-{run.thread}.md",
-                               mime="text/markdown")  # fmt: skip
+            st.download_button(
+                "Download memo (Markdown)",
+                text,
+                file_name=f"front-office-{run.thread}.md",
+                mime="text/markdown",
+            )
     with tabs[1]:
         approved = set((state.get("approval") or {}).get("approved", []))
         crit = {c["proposal_id"]: c for c in state.get("critiques", [])}

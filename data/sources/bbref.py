@@ -84,16 +84,41 @@ def _num(cell) -> float | None:
 
 
 ADVANCED_STATS = {
-    "age": "age", "games": "g", "games_started": "gs", "mp": "mp", "per": "per",
-    "ts_pct": "ts_pct", "fg3a_per_fga_pct": "fg3a_rate", "fta_per_fga_pct": "fta_rate",
-    "orb_pct": "orb_pct", "drb_pct": "drb_pct", "trb_pct": "trb_pct", "ast_pct": "ast_pct",
-    "stl_pct": "stl_pct", "blk_pct": "blk_pct", "tov_pct": "tov_pct", "usg_pct": "usg_pct",
-    "ows": "ows", "dws": "dws", "ws": "ws", "ws_per_48": "ws_per_48",
-    "obpm": "obpm", "dbpm": "dbpm", "bpm": "bpm", "vorp": "vorp",
-}  # fmt: skip
+    "age": "age",
+    "games": "g",
+    "games_started": "gs",
+    "mp": "mp",
+    "per": "per",
+    "ts_pct": "ts_pct",
+    "fg3a_per_fga_pct": "fg3a_rate",
+    "fta_per_fga_pct": "fta_rate",
+    "orb_pct": "orb_pct",
+    "drb_pct": "drb_pct",
+    "trb_pct": "trb_pct",
+    "ast_pct": "ast_pct",
+    "stl_pct": "stl_pct",
+    "blk_pct": "blk_pct",
+    "tov_pct": "tov_pct",
+    "usg_pct": "usg_pct",
+    "ows": "ows",
+    "dws": "dws",
+    "ws": "ws",
+    "ws_per_48": "ws_per_48",
+    "obpm": "obpm",
+    "dbpm": "dbpm",
+    "bpm": "bpm",
+    "vorp": "vorp",
+}
 _PCT_SCALED = {
-    "orb_pct", "drb_pct", "trb_pct", "ast_pct", "stl_pct", "blk_pct", "tov_pct", "usg_pct"
-}  # fmt: skip
+    "orb_pct",
+    "drb_pct",
+    "trb_pct",
+    "ast_pct",
+    "stl_pct",
+    "blk_pct",
+    "tov_pct",
+    "usg_pct",
+}
 
 
 def parse_advanced(html: str, season: str) -> pd.DataFrame:

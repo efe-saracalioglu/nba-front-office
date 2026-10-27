@@ -42,9 +42,10 @@ class LeagueState:
     def find_player(self, name: str, team: str | None = None) -> Player | None:
         needle = normalize_name(name)
         hits = [
-            p for p in self._players.values()
+            p
+            for p in self._players.values()
             if normalize_name(p.name) == needle and (team is None or p.team == team)
-        ]  # fmt: skip
+        ]
         return hits[0] if len(hits) == 1 else None
 
     def first_round_holdings(
@@ -116,17 +117,28 @@ def load_league(
         signed_on, traded_on = parse_how_acquired(how)
         teams[team].players.append(
             Player(
-                player_id=pid, name=name, team=team, salary=salary, is_two_way=bool(two_way),
-                signed_on=signed_on, acquired_by_trade_on=traded_on,
+                player_id=pid,
+                name=name,
+                team=team,
+                salary=salary,
+                is_two_way=bool(two_way),
+                signed_on=signed_on,
+                acquired_by_trade_on=traded_on,
             )
-        )  # fmt: skip
+        )
     for team, amount in dead:
         teams[team].dead_money = int(amount)
     pick_assets = {
         r[0]: PickAsset(
-            asset_id=r[0], year=r[1], round=r[2], owner=r[3], original=r[4], kind=r[5],
-            description=r[6], protection=r[7],
+            asset_id=r[0],
+            year=r[1],
+            round=r[2],
+            owner=r[3],
+            original=r[4],
+            kind=r[5],
+            description=r[6],
+            protection=r[7],
         )
         for r in picks
-    }  # fmt: skip
+    }
     return LeagueState(season=cfg, teams=teams, picks=pick_assets)

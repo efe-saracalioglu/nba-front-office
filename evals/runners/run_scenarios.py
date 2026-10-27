@@ -31,8 +31,13 @@ def produce(config_name: str, s: dict) -> dict:
     st = out.pop("state")
     approved = set((st.get("approval") or {}).get("approved", []))
     proposals = [p["legs"] for p in st.get("proposals", []) if p["id"] in approved]
-    return out | {"reply": st.get("memo") or st.get("answer") or "", "proposals": proposals, "route": st.get("route"),
-                  "sql_attempts": len(st.get("sql_attempts", [])), "revisions": st.get("revisions", 0)}  # fmt: skip
+    return out | {
+        "reply": st.get("memo") or st.get("answer") or "",
+        "proposals": proposals,
+        "route": st.get("route"),
+        "sql_attempts": len(st.get("sql_attempts", [])),
+        "revisions": st.get("revisions", 0),
+    }
 
 
 def run_one(s: dict, config_name: str) -> dict:

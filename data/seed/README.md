@@ -7,7 +7,7 @@ Basketball-Reference's transaction pages since 2019-20.
 |---|---|
 | `draft_picks.csv` | One row per pick asset for the next seven drafts; loaded into `draft_picks` by the warehouse build. |
 | `pick_review.csv` | Transfers the ledger could not apply cleanly: ownership conflicts, unannotated picks with several candidates, protection notes that can't be tied to one pick. |
-| `pick_overrides.yaml` | Optional manual resolutions, keyed by the trade in `pick_review.csv` (format in the `data/draft_picks.py` docstring). |
+| `pick_overrides.yaml` | Optional manual resolutions, keyed by the trade in `pick_review.csv` (see below). |
 
 How the ledger resolves annotations:
 
@@ -16,3 +16,13 @@ How the ledger resolves annotations:
 - `more/least favorable (of A and B)` creates a `conditional` asset; the teams are kept in `original_teams` when the text names them.
 - No annotation: the giver's own pick if it still holds it, else the one candidate asset it holds (`inferred = TRUE`).
 - A conflict (giver doesn't own the pick at that moment) is logged and the transfer is still applied, so the latest trade wins.
+
+Each override entry matches one transfer by `trade`, `year`, `round` and `from`, then either `skip: true` or names the `asset` to move. Add `create: {kind, originals, description, protection}` when the asset does not exist yet:
+
+```yaml
+- trade: "2023-06-28#5"
+  year: 2027
+  round: 2
+  from: ATL
+  asset: 2027-2-ATL
+```

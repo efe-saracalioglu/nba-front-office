@@ -35,9 +35,12 @@ def answer_with(config_name: str, question: str, item_id: str) -> dict:
     )
     s = out.pop("state")
     attempts = s.get("sql_attempts", [])
-    return out | {"answer": s.get("answer"), "route": s.get("route"),
-                  "sql_attempts": len([a for a in attempts if a["attempt"] != "fallback"]),
-                  "sql_first_try_ok": bool(attempts and attempts[0]["ok"])}  # fmt: skip
+    return out | {
+        "answer": s.get("answer"),
+        "route": s.get("route"),
+        "sql_attempts": len([a for a in attempts if a["attempt"] != "fallback"]),
+        "sql_first_try_ok": bool(attempts and attempts[0]["ok"]),
+    }
 
 
 def scored(item: dict, out: dict) -> dict:

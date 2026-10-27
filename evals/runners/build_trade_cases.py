@@ -48,8 +48,11 @@ class Proposer:
         return self.rng.choice(pool) if pool else None
 
     def _own_firsts(self, team: str) -> list[str]:
-        return sorted(a.asset_id for a in self.lg.picks.values()
-                      if a.owner == team and a.round == 1 and a.counts_as_pick)  # fmt: skip
+        return sorted(
+            a.asset_id
+            for a in self.lg.picks.values()
+            if a.owner == team and a.round == 1 and a.counts_as_pick
+        )
 
     def _seconds(self, team: str) -> list[str]:
         return sorted(
@@ -63,8 +66,10 @@ class Proposer:
         pb = self._close_salary(b, pa.salary, lo, hi)
         if not pb:
             return None
-        return [TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
-                TradeLeg(from_team=b, to_team=a, players=[pb.player_id])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
+            TradeLeg(from_team=b, to_team=a, players=[pb.player_id]),
+        ]
 
     def two_for_one(self) -> list[TradeLeg] | None:
         a, b = self._pair()
@@ -75,8 +80,10 @@ class Proposer:
         pb = self._close_salary(b, x.salary + y.salary, 0.75, 1.3)
         if not pb:
             return None
-        return [TradeLeg(from_team=a, to_team=b, players=[x.player_id, y.player_id]),
-                TradeLeg(from_team=b, to_team=a, players=[pb.player_id])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, players=[x.player_id, y.player_id]),
+            TradeLeg(from_team=b, to_team=a, players=[pb.player_id]),
+        ]
 
     def player_for_pick(self) -> list[TradeLeg] | None:
         a, b = self._pair()
@@ -84,8 +91,10 @@ class Proposer:
         seconds = self._seconds(b)
         if not seconds:
             return None
-        return [TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
-                TradeLeg(from_team=b, to_team=a, picks=[self.rng.choice(seconds)])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
+            TradeLeg(from_team=b, to_team=a, picks=[self.rng.choice(seconds)]),
+        ]
 
     def firsts_for_player(self) -> list[TradeLeg] | None:
         a, b = self._pair()
@@ -98,8 +107,10 @@ class Proposer:
         pb = self._close_salary(b, pa.salary, 0.9, 1.1)
         if not pb:
             return None
-        return [TradeLeg(from_team=a, to_team=b, players=[pa.player_id], picks=chosen),
-                TradeLeg(from_team=b, to_team=a, players=[pb.player_id])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, players=[pa.player_id], picks=chosen),
+            TradeLeg(from_team=b, to_team=a, players=[pb.player_id]),
+        ]
 
     def recent_signee(self) -> list[TradeLeg] | None:
         a, b = self._pair()
@@ -110,8 +121,10 @@ class Proposer:
         pb = self._close_salary(b, pa.salary, 0.9, 1.1)
         if not pb:
             return None
-        return [TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
-                TradeLeg(from_team=b, to_team=a, players=[pb.player_id])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, players=[pa.player_id]),
+            TradeLeg(from_team=b, to_team=a, players=[pb.player_id]),
+        ]
 
     def with_cash(self) -> list[TradeLeg] | None:
         legs = self.one_for_one()
@@ -127,15 +140,21 @@ class Proposer:
             x.asset_id for x in self.lg.picks.values() if x.owner not in (a, b) and x.round == 2
         ]
         pa = self.rng.choice(self._salaried(b))
-        return [TradeLeg(from_team=a, to_team=b, picks=[self.rng.choice(others)]),
-                TradeLeg(from_team=b, to_team=a, players=[pa.player_id])]  # fmt: skip
+        return [
+            TradeLeg(from_team=a, to_team=b, picks=[self.rng.choice(others)]),
+            TradeLeg(from_team=b, to_team=a, players=[pa.player_id]),
+        ]
 
     def shapes(self):
         return [
-            (self.one_for_one, 5), (self.two_for_one, 3), (self.player_for_pick, 2),
-            (self.firsts_for_player, 2), (self.recent_signee, 1), (self.with_cash, 1),
+            (self.one_for_one, 5),
+            (self.two_for_one, 3),
+            (self.player_for_pick, 2),
+            (self.firsts_for_player, 2),
+            (self.recent_signee, 1),
+            (self.with_cash, 1),
             (self.stolen_pick, 0.3),
-        ]  # fmt: skip
+        ]
 
 
 def bucket(v: TradeVerdict) -> str:
@@ -158,14 +177,30 @@ def context(lg: LeagueState, trade: Trade) -> dict:
         players = []
         for pid in leg.players:
             p = lg.player(pid)
-            players.append({"name": p.name, "salary": p.salary, "two_way": p.is_two_way,
-                            "signed_on": str(p.signed_on) if p.signed_on else None,
-                            "acquired_by_trade_on": str(p.acquired_by_trade_on) if p.acquired_by_trade_on else None})  # fmt: skip
+            players.append(
+                {
+                    "name": p.name,
+                    "salary": p.salary,
+                    "two_way": p.is_two_way,
+                    "signed_on": str(p.signed_on) if p.signed_on else None,
+                    "acquired_by_trade_on": str(p.acquired_by_trade_on)
+                    if p.acquired_by_trade_on
+                    else None,
+                }
+            )
         picks = []
         for aid in leg.picks:
             a = lg.picks[aid]
-            picks.append({"asset_id": aid, "year": a.year, "round": a.round, "original_team": a.original,
-                          "current_owner": a.owner, "kind": a.kind})  # fmt: skip
+            picks.append(
+                {
+                    "asset_id": aid,
+                    "year": a.year,
+                    "round": a.round,
+                    "original_team": a.original,
+                    "current_owner": a.owner,
+                    "kind": a.kind,
+                }
+            )
         legs.append(
             {
                 "from": leg.from_team,
@@ -178,18 +213,23 @@ def context(lg: LeagueState, trade: Trade) -> dict:
     return {
         "trade_date": str(trade.trade_date),
         "season": {
-            "salary_cap": s.salary_cap, "luxury_tax": s.luxury_tax, "first_apron": s.first_apron,
-            "second_apron": s.second_apron, "matching_cushion": s.trade.matching_cushion,
-            "matching_bracket": s.trade.matching_bracket, "cash_limit": s.trade.cash_limit,
+            "salary_cap": s.salary_cap,
+            "luxury_tax": s.luxury_tax,
+            "first_apron": s.first_apron,
+            "second_apron": s.second_apron,
+            "matching_cushion": s.trade.matching_cushion,
+            "matching_bracket": s.trade.matching_bracket,
+            "cash_limit": s.trade.cash_limit,
             "regular_season_start": str(s.calendar.regular_season_start),
             "trade_deadline": str(s.calendar.trade_deadline),
             "offseason_signing_trade_date": str(s.signing.offseason_trade_date),
-            "max_standard": s.roster.max_standard, "max_two_way": s.roster.max_two_way,
+            "max_standard": s.roster.max_standard,
+            "max_two_way": s.roster.max_two_way,
             "tradable_draft_years": [s.draft.first_tradable_year, s.draft.last_tradable_year],
         },
         "teams": teams,
         "legs": legs,
-    }  # fmt: skip
+    }
 
 
 def build(lg: LeagueState, seed: int, max_attempts: int = 200_000) -> list[dict]:
@@ -214,17 +254,19 @@ def build(lg: LeagueState, seed: int, max_attempts: int = 200_000) -> list[dict]
         if b not in QUOTAS or filled[b] >= QUOTAS[b]:
             continue
         filled[b] += 1
-        cases.append({
-            "id": f"trade-{len(cases) + 1:03d}",
-            "bucket": b,
-            "trade": json.loads(trade.model_dump_json()),
-            "context": context(lg, trade),
-            "expected": {
-                "valid": verdict.valid,
-                "violations": sorted({(v.code, v.team) for v in verdict.violations}),
-                "max_incoming": {t.team: t.max_incoming_salary for t in verdict.teams},
-            },
-        })  # fmt: skip
+        cases.append(
+            {
+                "id": f"trade-{len(cases) + 1:03d}",
+                "bucket": b,
+                "trade": json.loads(trade.model_dump_json()),
+                "context": context(lg, trade),
+                "expected": {
+                    "valid": verdict.valid,
+                    "violations": sorted({(v.code, v.team) for v in verdict.violations}),
+                    "max_incoming": {t.team: t.max_incoming_salary for t in verdict.teams},
+                },
+            }
+        )
     return cases
 
 

@@ -79,9 +79,12 @@ def find_candidates(deps: Deps, goal: dict) -> tuple[list[dict], list[dict]]:
     rows, attempts = sql_loop(deps, task, tables=["player_projections", "players", "teams"])
     if not rows:
         sql = FALLBACK_SQL.format(
-            team=goal["team"], positions=", ".join(f"'{p}'" for p in goal["positions"]),
-            max_age=goal["max_age"], min_ws=goal["min_projected_ws"], max_salary=goal.get("max_salary") or 10**10,
-        )  # fmt: skip
+            team=goal["team"],
+            positions=", ".join(f"'{p}'" for p in goal["positions"]),
+            max_age=goal["max_age"],
+            min_ws=goal["min_projected_ws"],
+            max_salary=goal.get("max_salary") or 10**10,
+        )
         rows = _rows_to_dicts(deps.tools.call("run_sql", query=sql))
         attempts.append({"attempt": "fallback", "sql": sql, "ok": bool(rows), "problem": None})
     own = goal["team"].upper()

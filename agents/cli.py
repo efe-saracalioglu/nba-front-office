@@ -35,8 +35,10 @@ def show_proposals(payload: dict) -> None:
         print(
             f"\n[{p['id']}] receive {p['receive']['name']} ({p['from_team']}) for {send}; {picks}"
         )
-        print(f"     WS change {v['ws_change_for_us']:+.1f}, our value {_fmt_money(v['our_value_change'])}, "
-              f"their value {_fmt_money(v['counterparty_value_change'])}")  # fmt: skip
+        print(
+            f"     WS change {v['ws_change_for_us']:+.1f}, our value {_fmt_money(v['our_value_change'])}, "
+            f"their value {_fmt_money(v['counterparty_value_change'])}"
+        )
         c = crit.get(p["id"])
         if c:
             print(f"     devil's advocate: {c['verdict']} - {c['reasoning'][:220]}")
@@ -106,8 +108,11 @@ def main() -> None:
 
     request = args.request or existing.values.get("request", "")
     team = args.team or existing.values.get("team") or "no-team"
-    tags = [f"team:{team}", "approval:auto" if args.auto_approve else "approval:human",
-            f"devils_advocate:{'on' if deps.devils_advocate else 'off'}"]  # fmt: skip
+    tags = [
+        f"team:{team}",
+        "approval:auto" if args.auto_approve else "approval:human",
+        f"devils_advocate:{'on' if deps.devils_advocate else 'off'}",
+    ]
     models = {
         role: deps.llm.model_for(role)
         for role in ("router", "gm", "stats", "scout", "devils_advocate", "memo")
@@ -132,8 +137,10 @@ def main() -> None:
         print(f"\n{state['memo']}")
     report = cost_report(state.get("usage", []))
     t = report["total"]
-    print(f"\n{t['calls']} LLM calls, {t['input_tokens'] + t['output_tokens']:,} tokens, {t['seconds']:.0f}s of model time, "
-          f"~${t['usd']:.4f} at list prices")  # fmt: skip
+    print(
+        f"\n{t['calls']} LLM calls, {t['input_tokens'] + t['output_tokens']:,} tokens, {t['seconds']:.0f}s of model time, "
+        f"~${t['usd']:.4f} at list prices"
+    )
     RUNS.mkdir(exist_ok=True)
     out = Path(RUNS / f"{datetime.now(UTC):%Y%m%dT%H%M%S}_{thread}.json")
     out.write_text(

@@ -135,9 +135,16 @@ def table_profiles(con) -> list[dict]:
             con, f"SELECT {', '.join(sample_cols)} FROM {name} {SAMPLE_WHERE[name]} LIMIT 4"
         )
         out.append(
-            {"name": name, "rows": n, "description": desc, "use": use,
-             "columns": columns, "sample_columns": sample_cols, "sample": sample}
-        )  # fmt: skip
+            {
+                "name": name,
+                "rows": n,
+                "description": desc,
+                "use": use,
+                "columns": columns,
+                "sample_columns": sample_cols,
+                "sample": sample,
+            }
+        )
     return out
 
 

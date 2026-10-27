@@ -74,8 +74,16 @@ def search_players(
         for p in t.players:
             name = normalize_name(p.name)
             if not needle or needle in name:
-                out.append({"player_id": p.player_id, "name": p.name, "team": p.team, "salary": p.salary,
-                            "two_way": p.is_two_way, "exact": name == needle})  # fmt: skip
+                out.append(
+                    {
+                        "player_id": p.player_id,
+                        "name": p.name,
+                        "team": p.team,
+                        "salary": p.salary,
+                        "two_way": p.is_two_way,
+                        "exact": name == needle,
+                    }
+                )
     out.sort(key=lambda r: (not r["exact"], -(r["salary"] or 0)))
     return out[:limit]
 
@@ -109,15 +117,25 @@ def team_cap_sheet(lg: LeagueState, con: duckdb.DuckDBPyConnection, team: str) -
     for p in sorted(state.players, key=lambda x: -(x.salary or 0)):
         y = years.loc[p.player_id] if p.player_id in years.index else None
         pr = proj.loc[p.player_id] if p.player_id in proj.index else None
-        roster.append({
-            "name": p.name, "salary": p.salary, "two_way": p.is_two_way,
-            "contract_through": y["through"] if y is not None else None,
-            "option_this_season": y["option_now"] if y is not None and y["option_now"] != "none" else None,
-            "signed_on": str(p.signed_on) if p.signed_on else None,
-            "projected_ws": round(float(pr["projected_ws"]), 1) if pr is not None else None,
-            "surplus_value": int(pr["surplus_value"]) if pr is not None and not pd.isna(pr["surplus_value"]) else None,
-            "injury": injuries.loc[p.player_id, "status"] if p.player_id in injuries.index else None,
-        })  # fmt: skip
+        roster.append(
+            {
+                "name": p.name,
+                "salary": p.salary,
+                "two_way": p.is_two_way,
+                "contract_through": y["through"] if y is not None else None,
+                "option_this_season": y["option_now"]
+                if y is not None and y["option_now"] != "none"
+                else None,
+                "signed_on": str(p.signed_on) if p.signed_on else None,
+                "projected_ws": round(float(pr["projected_ws"]), 1) if pr is not None else None,
+                "surplus_value": int(pr["surplus_value"])
+                if pr is not None and not pd.isna(pr["surplus_value"])
+                else None,
+                "injury": injuries.loc[p.player_id, "status"]
+                if p.player_id in injuries.index
+                else None,
+            }
+        )
     payroll = state.payroll
     return {
         "team": abbr,
@@ -125,15 +143,17 @@ def team_cap_sheet(lg: LeagueState, con: duckdb.DuckDBPyConnection, team: str) -
         "payroll": payroll,
         "status": cap_status(payroll, s).value,
         "room_to": {
-            "salary_cap": s.salary_cap - payroll, "luxury_tax": s.luxury_tax - payroll,
-            "first_apron": s.first_apron - payroll, "second_apron": s.second_apron - payroll,
+            "salary_cap": s.salary_cap - payroll,
+            "luxury_tax": s.luxury_tax - payroll,
+            "first_apron": s.first_apron - payroll,
+            "second_apron": s.second_apron - payroll,
         },
         "dead_money": state.dead_money,
         "standard_contracts": state.standard_roster,
         "two_way_contracts": state.two_way_roster,
         "first_round_picks_by_year": lg.first_round_holdings(abbr),
         "roster": roster,
-    }  # fmt: skip
+    }
 
 
 def _legs(lg: LeagueState, legs: list[dict]) -> list[TradeLeg]:
@@ -162,8 +182,14 @@ def check_trade(lg: LeagueState, legs: list[dict], trade_date: str | None = None
     return json.loads(verdict.model_dump_json())
 
 
-def salary_matches(lg: LeagueState, team: str, target: str, max_players: int = 3, limit: int = 8,
-                   trade_date: str | None = None) -> dict:  # fmt: skip
+def salary_matches(
+    lg: LeagueState,
+    team: str,
+    target: str,
+    max_players: int = 3,
+    limit: int = 8,
+    trade_date: str | None = None,
+) -> dict:
     abbr = _team(lg, team)
     goal = resolve_player(lg, target)
     if goal.team == abbr:
@@ -176,17 +202,24 @@ def salary_matches(lg: LeagueState, team: str, target: str, max_players: int = 3
             out_salary = sum(p.salary for p in combo)
             if out_salary > (goal.salary or 0) * 1.6 + 5_000_000:
                 continue
-            trade = Trade(trade_date=day, legs=[
-                TradeLeg(from_team=abbr, to_team=goal.team, players=[p.player_id for p in combo]),
-                TradeLeg(from_team=goal.team, to_team=abbr, players=[goal.player_id]),
-            ])  # fmt: skip
+            trade = Trade(
+                trade_date=day,
+                legs=[
+                    TradeLeg(
+                        from_team=abbr, to_team=goal.team, players=[p.player_id for p in combo]
+                    ),
+                    TradeLeg(from_team=goal.team, to_team=abbr, players=[goal.player_id]),
+                ],
+            )
             v = validate_trade(trade, lg)
             if v.valid:
-                found.append({
-                    "send": [{"name": p.name, "salary": p.salary} for p in combo],
-                    "outgoing_salary": out_salary,
-                    "warnings": [w.message for w in v.warnings],
-                })  # fmt: skip
+                found.append(
+                    {
+                        "send": [{"name": p.name, "salary": p.salary} for p in combo],
+                        "outgoing_salary": out_salary,
+                        "warnings": [w.message for w in v.warnings],
+                    }
+                )
         if len(found) >= limit:
             break
     found.sort(key=lambda f: (len(f["send"]), abs(f["outgoing_salary"] - (goal.salary or 0))))
@@ -204,28 +237,42 @@ def player_value(
     p = resolve_player(lg, player, team)
     proj = _projection(con, p.player_id)
     return {
-        "name": p.name, "team": p.team, "salary": p.salary,
+        "name": p.name,
+        "team": p.team,
+        "salary": p.salary,
         "projection": proj,
         "explanation": (
             "projected_ws is the model's median next-season Win Shares per 82 games; ws_p10..ws_p90 is an "
             "80% interval; surplus_value = market_value - salary in dollars."
-            if proj else "No projection: the player logged fewer than 250 NBA minutes last season."
+            if proj
+            else "No projection: the player logged fewer than 250 NBA minutes last season."
         ),
-    }  # fmt: skip
+    }
 
 
 def draft_assets(lg: LeagueState, team: str) -> dict:
     abbr = _team(lg, team)
     owned, traded_away, encumbered = [], [], []
     for a in sorted(lg.picks.values(), key=lambda x: (x.year, x.round, x.asset_id)):
-        info = {"asset_id": a.asset_id, "year": a.year, "round": a.round, "kind": a.kind,
-                "original_team": a.original, "description": a.description, "protection": a.protection}  # fmt: skip
+        info = {
+            "asset_id": a.asset_id,
+            "year": a.year,
+            "round": a.round,
+            "kind": a.kind,
+            "original_team": a.original,
+            "description": a.description,
+            "protection": a.protection,
+        }
         if a.owner == abbr:
             owned.append(info)
         elif a.original == abbr and a.counts_as_pick:
             traded_away.append(info | {"now_owned_by": a.owner})
         elif a.kind == "swap_right" and abbr in (a.description or "") + (a.original or ""):
             encumbered.append(info | {"held_by": a.owner})
-    return {"team": abbr, "owned": owned, "own_picks_traded_away": traded_away,
-            "swap_rights_held_by_others": encumbered,
-            "first_round_picks_by_year": lg.first_round_holdings(abbr)}  # fmt: skip
+    return {
+        "team": abbr,
+        "owned": owned,
+        "own_picks_traded_away": traded_away,
+        "swap_rights_held_by_others": encumbered,
+        "first_round_picks_by_year": lg.first_round_holdings(abbr),
+    }

@@ -112,9 +112,13 @@ def test_ledger_unannotated_pick_is_inferred_as_givers_own():
 def test_ledger_override_creates_asset():
     t = _t("a#0", 2031, 1, "SAC", "SAS", "something odd")
     override = {
-        "trade": "a#0", "year": 2031, "round": 1, "from": "SAC", "asset": "custom",
+        "trade": "a#0",
+        "year": 2031,
+        "round": 1,
+        "from": "SAC",
+        "asset": "custom",
         "create": {"kind": "conditional", "originals": ["SAC"], "description": "manual"},
-    }  # fmt: skip
+    }
     ledger = build_ledger([t], range(2031, 2032), {("a#0", 2031, 1, "SAC"): override})
     assert ledger.assets["custom"].owner == "SAS"
     assert ledger.review == []

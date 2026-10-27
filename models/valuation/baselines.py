@@ -20,7 +20,7 @@ def marcel(df: pd.DataFrame) -> np.ndarray:
     return (ws48 * df["marcel_minutes"] / 48).to_numpy()
 
 
-def ridge(features: list[str]):
+def ridge():
     return make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),

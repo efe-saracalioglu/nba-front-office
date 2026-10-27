@@ -17,7 +17,7 @@ One trace per agent run (session = thread id, tags = team, approval mode, devil'
 - `generation` per LLM call: model, prompt, reply, tokens, cost at the list prices in `config/models.yaml`
 - `tool` per MCP call: arguments, result, errors
 
-Tracing switches itself off when the keys are missing or `FRONT_OFFICE_TRACING=0`, so tests and the hosted demo do not need Langfuse.
+Tracing switches itself off when the keys are missing or `FRONT_OFFICE_TRACING=0`, so tests and the Docker app run without it.
 
 This deployment runs Langfuse v4 in events-only mode: read traces back with `GET /api/public/v2/observations?traceId=...`, not the legacy `/api/public/traces` endpoint.
 

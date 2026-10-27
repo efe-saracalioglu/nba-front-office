@@ -14,26 +14,73 @@ from data.sources import bbref, nba_stats, pbp_archive
 log = logging.getLogger("etl")
 
 BASE_COLS = {
-    "PLAYER_ID": "player_id", "PLAYER_NAME": "player_name", "TEAM_ID": "team_id",
-    "TEAM_ABBREVIATION": "team_abbreviation", "AGE": "age", "GP": "gp", "MIN": "min",
-    "PTS": "pts", "REB": "reb", "OREB": "oreb", "DREB": "dreb", "AST": "ast", "STL": "stl",
-    "BLK": "blk", "TOV": "tov", "PF": "pf", "FGM": "fgm", "FGA": "fga", "FG3M": "fg3m",
-    "FG3A": "fg3a", "FTM": "ftm", "FTA": "fta", "PLUS_MINUS": "plus_minus",
-}  # fmt: skip
-ADV_COLS = {
-    "OFF_RATING": "off_rating", "DEF_RATING": "def_rating", "NET_RATING": "net_rating",
-    "AST_PCT": "ast_pct", "OREB_PCT": "oreb_pct", "DREB_PCT": "dreb_pct", "REB_PCT": "reb_pct",
-    "TM_TOV_PCT": "tov_pct", "EFG_PCT": "efg_pct", "TS_PCT": "ts_pct", "USG_PCT": "usg_pct",
-    "PACE": "pace", "PIE": "pie", "POSS": "poss",
-}  # fmt: skip
-LOG_COLS = {
-    "GAME_ID": "game_id", "PLAYER_ID": "player_id", "PLAYER_NAME": "player_name",
-    "TEAM_ID": "team_id", "TEAM_ABBREVIATION": "team_abbreviation", "GAME_DATE": "game_date",
-    "MATCHUP": "matchup", "WL": "wl", "MIN": "min", "PTS": "pts", "REB": "reb", "OREB": "oreb",
-    "DREB": "dreb", "AST": "ast", "STL": "stl", "BLK": "blk", "TOV": "tov", "PF": "pf",
-    "FGM": "fgm", "FGA": "fga", "FG3M": "fg3m", "FG3A": "fg3a", "FTM": "ftm", "FTA": "fta",
+    "PLAYER_ID": "player_id",
+    "PLAYER_NAME": "player_name",
+    "TEAM_ID": "team_id",
+    "TEAM_ABBREVIATION": "team_abbreviation",
+    "AGE": "age",
+    "GP": "gp",
+    "MIN": "min",
+    "PTS": "pts",
+    "REB": "reb",
+    "OREB": "oreb",
+    "DREB": "dreb",
+    "AST": "ast",
+    "STL": "stl",
+    "BLK": "blk",
+    "TOV": "tov",
+    "PF": "pf",
+    "FGM": "fgm",
+    "FGA": "fga",
+    "FG3M": "fg3m",
+    "FG3A": "fg3a",
+    "FTM": "ftm",
+    "FTA": "fta",
     "PLUS_MINUS": "plus_minus",
-}  # fmt: skip
+}
+ADV_COLS = {
+    "OFF_RATING": "off_rating",
+    "DEF_RATING": "def_rating",
+    "NET_RATING": "net_rating",
+    "AST_PCT": "ast_pct",
+    "OREB_PCT": "oreb_pct",
+    "DREB_PCT": "dreb_pct",
+    "REB_PCT": "reb_pct",
+    "TM_TOV_PCT": "tov_pct",
+    "EFG_PCT": "efg_pct",
+    "TS_PCT": "ts_pct",
+    "USG_PCT": "usg_pct",
+    "PACE": "pace",
+    "PIE": "pie",
+    "POSS": "poss",
+}
+LOG_COLS = {
+    "GAME_ID": "game_id",
+    "PLAYER_ID": "player_id",
+    "PLAYER_NAME": "player_name",
+    "TEAM_ID": "team_id",
+    "TEAM_ABBREVIATION": "team_abbreviation",
+    "GAME_DATE": "game_date",
+    "MATCHUP": "matchup",
+    "WL": "wl",
+    "MIN": "min",
+    "PTS": "pts",
+    "REB": "reb",
+    "OREB": "oreb",
+    "DREB": "dreb",
+    "AST": "ast",
+    "STL": "stl",
+    "BLK": "blk",
+    "TOV": "tov",
+    "PF": "pf",
+    "FGM": "fgm",
+    "FGA": "fga",
+    "FG3M": "fg3m",
+    "FG3A": "fg3a",
+    "FTM": "ftm",
+    "FTA": "fta",
+    "PLUS_MINUS": "plus_minus",
+}
 
 
 def load_teams(con) -> None:
@@ -42,11 +89,16 @@ def load_teams(con) -> None:
         abbr, bbref_abbr, conf, div = config.TEAMS[t["id"]]
         rows.append(
             {
-                "team_id": t["id"], "abbreviation": abbr, "bbref_abbreviation": bbref_abbr,
-                "full_name": t["full_name"], "city": t["city"], "nickname": t["nickname"],
-                "conference": conf, "division": div,
+                "team_id": t["id"],
+                "abbreviation": abbr,
+                "bbref_abbreviation": bbref_abbr,
+                "full_name": t["full_name"],
+                "city": t["city"],
+                "nickname": t["nickname"],
+                "conference": conf,
+                "division": div,
             }
-        )  # fmt: skip
+        )
     db.replace_rows(con, "teams", pd.DataFrame(rows), source="nba_api.static")
 
 
@@ -81,13 +133,18 @@ def current_rosters(season: str, refresh: bool) -> pd.DataFrame:
     two_way = pd.to_numeric(df.get("SUPPLEMENTAL_STATUS"), errors="coerce").fillna(0) == 1
     return pd.DataFrame(
         {
-            "team_id": df["TeamID"], "season": season, "player_id": df["PLAYER_ID"],
-            "player_name": df["PLAYER"], "jersey": df["NUM"], "position": df["POSITION"],
+            "team_id": df["TeamID"],
+            "season": season,
+            "player_id": df["PLAYER_ID"],
+            "player_name": df["PLAYER"],
+            "jersey": df["NUM"],
+            "position": df["POSITION"],
             "birth_date": pd.to_datetime(df["BIRTH_DATE"], format="mixed", errors="coerce").dt.date,
-            "experience": df["EXP"].astype(str), "how_acquired": df.get("HOW_ACQUIRED"),
+            "experience": df["EXP"].astype(str),
+            "how_acquired": df.get("HOW_ACQUIRED"),
             "is_two_way": two_way,
         }
-    )  # fmt: skip
+    )
 
 
 def build_players(stats, bios, advanced, rosters, xwalk) -> pd.DataFrame:
@@ -105,12 +162,13 @@ def build_players(stats, bios, advanced, rosters, xwalk) -> pd.DataFrame:
             "player_id": bio["PLAYER_ID"],
             "height_in": pd.to_numeric(bio["PLAYER_HEIGHT_INCHES"], errors="coerce"),
             "weight_lb": pd.to_numeric(bio["PLAYER_WEIGHT"], errors="coerce"),
-            "country": bio["COUNTRY"], "college": bio["COLLEGE"],
+            "country": bio["COUNTRY"],
+            "college": bio["COLLEGE"],
             "draft_year": pd.to_numeric(bio["DRAFT_YEAR"], errors="coerce"),
             "draft_round": pd.to_numeric(bio["DRAFT_ROUND"], errors="coerce"),
             "draft_number": pd.to_numeric(bio["DRAFT_NUMBER"], errors="coerce"),
         }
-    )  # fmt: skip
+    )
     pos = advanced.sort_values("season").drop_duplicates("player_id", keep="last")[
         ["player_id", "position"]
     ]

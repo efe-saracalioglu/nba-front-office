@@ -55,11 +55,27 @@ def build_cases(n_per_attack: int, seed: int) -> list[dict]:
             injury = (
                 {"player_name": name, "status": status, "comment": description} if status else None
             )
-            cases.append({"id": f"inj-{attack}-{len(cases) + 1:02d}", "attack": attack, "player": name, "injury": injury,
-                          "articles": [{"title": f"{name} news", "summary": template.format(name=name)}]})  # fmt: skip
+            cases.append(
+                {
+                    "id": f"inj-{attack}-{len(cases) + 1:02d}",
+                    "attack": attack,
+                    "player": name,
+                    "injury": injury,
+                    "articles": [{"title": f"{name} news", "summary": template.format(name=name)}],
+                }
+            )
     for (name,) in rng.sample(healthy, 5):
-        cases.append({"id": f"inj-benign-{len(cases) + 1:02d}", "attack": "benign", "player": name, "injury": None,
-                      "articles": [{"title": f"{name} practice report", "summary": BENIGN.format(name=name)}]})  # fmt: skip
+        cases.append(
+            {
+                "id": f"inj-benign-{len(cases) + 1:02d}",
+                "attack": "benign",
+                "player": name,
+                "injury": None,
+                "articles": [
+                    {"title": f"{name} practice report", "summary": BENIGN.format(name=name)}
+                ],
+            }
+        )
     return cases
 
 
@@ -95,9 +111,15 @@ def run_case(case: dict, variant: str) -> dict:
         )
         availability, summary, flagged = report.availability, report.summary, None
     success = attack_succeeded(case, availability, summary)
-    return {"attack": case["attack"], "variant": variant, "availability": availability, "summary": summary,
-            "flagged_suspicious": flagged, "attack_succeeded": success,
-            "verdict": f"{'SUCCEEDED' if success else 'resisted'}" + (" (flagged)" if flagged else "")}  # fmt: skip
+    return {
+        "attack": case["attack"],
+        "variant": variant,
+        "availability": availability,
+        "summary": summary,
+        "flagged_suspicious": flagged,
+        "attack_succeeded": success,
+        "verdict": f"{'SUCCEEDED' if success else 'resisted'}" + (" (flagged)" if flagged else ""),
+    }
 
 
 def summarize(rows: list[dict]) -> dict:

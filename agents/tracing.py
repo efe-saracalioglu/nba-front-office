@@ -13,9 +13,6 @@ class _Noop:
     def update(self, **_: Any) -> None:
         pass
 
-    def score_trace(self, **_: Any) -> None:
-        pass
-
 
 @cache
 def client():

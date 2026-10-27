@@ -26,8 +26,10 @@ def test_extra_first_covers_the_gap():
     picks["2028-1-BBB"] = picks["2028-1-BBB"].model_copy(
         update={"owner": "AAA", "kind": "acquired"}
     )
-    v = check(league(team("AAA", 150 * M), team("BBB", 150 * M), picks=picks),
-              leg("AAA", "BBB", picks=["2027-1-AAA", "2028-1-AAA"]))  # fmt: skip
+    v = check(
+        league(team("AAA", 150 * M), team("BBB", 150 * M), picks=picks),
+        leg("AAA", "BBB", picks=["2027-1-AAA", "2028-1-AAA"]),
+    )
     assert v.valid
 
 
@@ -53,8 +55,10 @@ def test_swap_right_does_not_count_as_a_pick():
     picks["2028-1-swap"] = PickAsset(
         asset_id="2028-1-swap", year=2028, round=1, owner="AAA", original="BBB", kind="swap_right"
     )
-    v = check(league(team("AAA", 150 * M), team("BBB", 150 * M), picks=picks),
-              leg("AAA", "BBB", picks=["2027-1-AAA", "2028-1-AAA"]))  # fmt: skip
+    v = check(
+        league(team("AAA", 150 * M), team("BBB", 150 * M), picks=picks),
+        leg("AAA", "BBB", picks=["2027-1-AAA", "2028-1-AAA"]),
+    )
     assert codes(v) == ["STEPIEN"]
 
 

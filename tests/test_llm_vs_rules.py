@@ -20,8 +20,11 @@ def test_parse_rejects_missing_verdict():
 
 
 def _case(i, valid, codes):
-    return {"id": f"c{i}", "bucket": "VALID" if valid else codes[0],
-            "expected": {"valid": valid, "violations": [[c, "AAA"] for c in codes]}}  # fmt: skip
+    return {
+        "id": f"c{i}",
+        "bucket": "VALID" if valid else codes[0],
+        "expected": {"valid": valid, "violations": [[c, "AAA"] for c in codes]},
+    }
 
 
 def _row(i, parsed):

@@ -55,9 +55,13 @@ def run_graph(
         root.update(output=state.get("memo") or state.get("answer") or error)
     usage = deps.llm.usage()
     return {
-        "state": state, "error": error, "trace_id": trace_id, "seconds": round(time.perf_counter() - start, 1),
-        "cost": cost_report(usage)["total"], "tool_calls": len(deps.tools.calls),
-    }  # fmt: skip
+        "state": state,
+        "error": error,
+        "trace_id": trace_id,
+        "seconds": round(time.perf_counter() - start, 1),
+        "cost": cost_report(usage)["total"],
+        "tool_calls": len(deps.tools.calls),
+    }
 
 
 class TransientError(RuntimeError):

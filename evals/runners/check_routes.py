@@ -29,10 +29,13 @@ def main() -> None:
                 rows.append({"id": item["id"], "expected": expected, "got": got, "text": text})
                 print(f"{item['id']}: expected {expected}, got {got}", flush=True)
     total = sum(confusion.values())
-    summary = {"config": args.config, "requests": total,
-               "accuracy": round(1 - len(rows) / total, 3),
-               "confusion": {f"{e} -> {g}": n for (e, g), n in sorted(confusion.items())},
-               "misrouted": rows}  # fmt: skip
+    summary = {
+        "config": args.config,
+        "requests": total,
+        "accuracy": round(1 - len(rows) / total, 3),
+        "confusion": {f"{e} -> {g}": n for (e, g), n in sorted(confusion.items())},
+        "misrouted": rows,
+    }
     (RESULTS / f"routes_{args.config}.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )

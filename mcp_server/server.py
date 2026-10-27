@@ -209,14 +209,22 @@ def get_player_news(
     return news.player_news(player, limit)
 
 
-@mcp.resource("frontoffice://schema", name="warehouse-schema", mime_type="text/plain",
-              description="DDL of every warehouse table with column notes")  # fmt: skip
+@mcp.resource(
+    "frontoffice://schema",
+    name="warehouse-schema",
+    mime_type="text/plain",
+    description="DDL of every warehouse table with column notes",
+)
 def schema_resource() -> str:
     return SCHEMA_SQL.read_text(encoding="utf-8")
 
 
-@mcp.resource("frontoffice://sql-examples", name="sql-examples", mime_type="text/markdown",
-              description="Worked example queries and warehouse conventions for text-to-SQL")  # fmt: skip
+@mcp.resource(
+    "frontoffice://sql-examples",
+    name="sql-examples",
+    mime_type="text/markdown",
+    description="Worked example queries and warehouse conventions for text-to-SQL",
+)
 def sql_examples_resource() -> str:
     return (RESOURCES / "sql_examples.md").read_text(encoding="utf-8")
 
@@ -225,26 +233,32 @@ def _money(v: int) -> str:
     return f"${v:,}"
 
 
-@mcp.resource("frontoffice://cba-rules", name="cba-rules", mime_type="text/markdown",
-              description="2026-27 cap figures and the trade rules the engine enforces")  # fmt: skip
+@mcp.resource(
+    "frontoffice://cba-rules",
+    name="cba-rules",
+    mime_type="text/markdown",
+    description="2026-27 cap figures and the trade rules the engine enforces",
+)
 def cba_rules_resource() -> str:
     s = league().season
     m = _money
-    return "\n".join([
-        f"# {s.season} salary cap and trade rules",
-        f"- Salary cap {m(s.salary_cap)}, luxury tax {m(s.luxury_tax)}, first apron {m(s.first_apron)}, second apron {m(s.second_apron)}.",
-        f"- Salary matching for teams over the cap and below the first apron after the trade: incoming salary up to "
-        f"max(min(200% of outgoing + {m(s.trade.matching_cushion)}, outgoing + {m(s.trade.matching_bracket)}), 125% of outgoing + {m(s.trade.matching_cushion)}).",
-        "- Teams above the first apron after the trade can take back at most 100% of outgoing salary.",
-        "- Teams above the second apron after the trade cannot aggregate salaries or send cash.",
-        f"- Cash sent or received in trades is capped at {m(s.trade.cash_limit)} per team.",
-        f"- In season, at most {s.roster.max_standard} standard and {s.roster.max_two_way} two-way contracts.",
-        "- Stepien rule: a team cannot be left without a first-round pick in consecutive future drafts.",
-        f"- Picks can be traded for drafts {s.draft.first_tradable_year} to {s.draft.last_tradable_year}.",
-        f"- Players signed this offseason cannot be traded before {s.signing.offseason_trade_date} or three months after signing.",
-        f"- Trade deadline: {s.calendar.trade_deadline}.",
-        "Sources: " + ", ".join(s.sources),
-    ])  # fmt: skip
+    return "\n".join(
+        [
+            f"# {s.season} salary cap and trade rules",
+            f"- Salary cap {m(s.salary_cap)}, luxury tax {m(s.luxury_tax)}, first apron {m(s.first_apron)}, second apron {m(s.second_apron)}.",
+            f"- Salary matching for teams over the cap and below the first apron after the trade: incoming salary up to "
+            f"max(min(200% of outgoing + {m(s.trade.matching_cushion)}, outgoing + {m(s.trade.matching_bracket)}), 125% of outgoing + {m(s.trade.matching_cushion)}).",
+            "- Teams above the first apron after the trade can take back at most 100% of outgoing salary.",
+            "- Teams above the second apron after the trade cannot aggregate salaries or send cash.",
+            f"- Cash sent or received in trades is capped at {m(s.trade.cash_limit)} per team.",
+            f"- In season, at most {s.roster.max_standard} standard and {s.roster.max_two_way} two-way contracts.",
+            "- Stepien rule: a team cannot be left without a first-round pick in consecutive future drafts.",
+            f"- Picks can be traded for drafts {s.draft.first_tradable_year} to {s.draft.last_tradable_year}.",
+            f"- Players signed this offseason cannot be traded before {s.signing.offseason_trade_date} or three months after signing.",
+            f"- Trade deadline: {s.calendar.trade_deadline}.",
+            "Sources: " + ", ".join(s.sources),
+        ]
+    )
 
 
 def main() -> None:

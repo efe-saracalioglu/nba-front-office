@@ -43,10 +43,16 @@ def check(ctx: TradeContext) -> list[RuleViolation]:
             code, why = "SALARY_MATCHING", "takes back more salary than the matching rules allow"
         out.append(
             RuleViolation(
-                code=code, team=flow.team,
+                code=code,
+                team=flow.team,
                 message=f"{flow.team} {why}: incoming ${flow.in_salary:,} vs allowed ${limit:,} (outgoing ${flow.out_salary:,}).",
-                details={"incoming": flow.in_salary, "outgoing": flow.out_salary, "allowed": limit,
-                         "payroll_before": flow.payroll_before, "payroll_after": flow.payroll_after},
+                details={
+                    "incoming": flow.in_salary,
+                    "outgoing": flow.out_salary,
+                    "allowed": limit,
+                    "payroll_before": flow.payroll_before,
+                    "payroll_after": flow.payroll_after,
+                },
             )
-        )  # fmt: skip
+        )
     return out

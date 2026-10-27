@@ -51,19 +51,29 @@ def leader(con, rng) -> dict:
         f"SELECT player_name, {expr} AS v FROM {table} WHERE season = ? AND {where} ORDER BY v DESC LIMIT 1",
         [season],
     )
-    return {"question": f"Who led the NBA in {label} in the {season} regular season?", "kind": "name",
-            "answer": name, "context_value": value, "template": "leader"}  # fmt: skip
+    return {
+        "question": f"Who led the NBA in {label} in the {season} regular season?",
+        "kind": "name",
+        "answer": name,
+        "context_value": value,
+        "template": "leader",
+    }
 
 
 def player_average(con, rng) -> dict:
     season = rng.choice(SEASONS)
-    name, gp, ppg = one(
+    name, _, ppg = one(
         con,
         "SELECT player_name, gp, round(pts / gp, 1) FROM player_season_stats WHERE season = ? AND gp >= 50 AND pts / gp >= 15 ORDER BY hash(player_name || ?) LIMIT 1",
         [season, salt(rng)],
     )
-    return {"question": f"How many points per game did {name} average in {season}?", "kind": "number",
-            "answer": ppg, "tolerance": 0.15, "template": "player_average"}  # fmt: skip
+    return {
+        "question": f"How many points per game did {name} average in {season}?",
+        "kind": "number",
+        "answer": ppg,
+        "tolerance": 0.15,
+        "template": "player_average",
+    }
 
 
 def team_wins(con, rng) -> dict:
@@ -73,8 +83,13 @@ def team_wins(con, rng) -> dict:
         "SELECT t.full_name, s.w FROM team_season_stats s JOIN teams t USING (team_id) WHERE season = ? ORDER BY hash(t.full_name || ?) LIMIT 1",
         [season, salt(rng)],
     )
-    return {"question": f"How many regular-season games did the {team} win in {season}?", "kind": "number",
-            "answer": w, "tolerance": 0, "template": "team_wins"}  # fmt: skip
+    return {
+        "question": f"How many regular-season games did the {team} win in {season}?",
+        "kind": "number",
+        "answer": w,
+        "tolerance": 0,
+        "template": "team_wins",
+    }
 
 
 def best_net_rating(con, rng) -> dict:
@@ -84,8 +99,13 @@ def best_net_rating(con, rng) -> dict:
         "SELECT t.full_name, t.abbreviation FROM team_season_stats s JOIN teams t USING (team_id) WHERE season = ? ORDER BY net_rating DESC LIMIT 1",
         [season],
     )
-    return {"question": f"Which team had the best net rating in {season}?", "kind": "team",
-            "answer": team, "aliases": [abbr, team.split()[-1]], "template": "best_net_rating"}  # fmt: skip
+    return {
+        "question": f"Which team had the best net rating in {season}?",
+        "kind": "team",
+        "answer": team,
+        "aliases": [abbr, team.split()[-1]],
+        "template": "best_net_rating",
+    }
 
 
 def payroll(con, rng) -> dict:
@@ -94,8 +114,13 @@ def payroll(con, rng) -> dict:
         "SELECT t.full_name, t.abbreviation, sum(c.salary) FROM contracts c JOIN teams t USING (team_id) WHERE c.season = '2026-27' GROUP BY 1, 2 ORDER BY hash(t.full_name || ?) LIMIT 1",
         [salt(rng)],
     )
-    return {"question": f"What is the {team}' total 2026-27 payroll in the contracts table, in dollars?", "kind": "money",
-            "answer": int(total), "tolerance_pct": 0.01, "template": "payroll"}  # fmt: skip
+    return {
+        "question": f"What is the {team}' total 2026-27 payroll in the contracts table, in dollars?",
+        "kind": "money",
+        "answer": int(total),
+        "tolerance_pct": 0.01,
+        "template": "payroll",
+    }
 
 
 def contract_salary(con, rng) -> dict:
@@ -104,8 +129,13 @@ def contract_salary(con, rng) -> dict:
         "SELECT player_name, season, salary FROM contracts WHERE season IN ('2026-27', '2027-28') AND salary > 15000000 ORDER BY hash(player_name || season || ?) LIMIT 1",
         [salt(rng)],
     )
-    return {"question": f"How much is {name} scheduled to be paid in the {season} season?", "kind": "money",
-            "answer": int(salary), "tolerance_pct": 0.01, "template": "contract_salary"}  # fmt: skip
+    return {
+        "question": f"How much is {name} scheduled to be paid in the {season} season?",
+        "kind": "money",
+        "answer": int(salary),
+        "tolerance_pct": 0.01,
+        "template": "contract_salary",
+    }
 
 
 def pick_owner(con, rng) -> dict:
@@ -117,8 +147,13 @@ def pick_owner(con, rng) -> dict:
         WHERE d.round = 1 AND d.kind = 'acquired' ORDER BY hash(og.full_name || d.year || ?) LIMIT 1""",
         [salt(rng)],
     )
-    return {"question": f"Which team currently owns the {team}' own {year} first-round pick?", "kind": "team",
-            "answer": owner_name, "aliases": [owner_abbr, owner_name.split()[-1]], "template": "pick_owner"}  # fmt: skip
+    return {
+        "question": f"Which team currently owns the {team}' own {year} first-round pick?",
+        "kind": "team",
+        "answer": owner_name,
+        "aliases": [owner_abbr, owner_name.split()[-1]],
+        "template": "pick_owner",
+    }
 
 
 def games_over_40(con, rng) -> dict:
@@ -127,8 +162,13 @@ def games_over_40(con, rng) -> dict:
         "SELECT player_name, count(*) FILTER (WHERE pts >= 40) n FROM player_game_logs WHERE season = '2025-26' GROUP BY 1 HAVING n >= 1 ORDER BY hash(player_name || ?) LIMIT 1",
         [salt(rng)],
     )
-    return {"question": f"In how many 2025-26 regular-season games did {name} score 40 or more points?", "kind": "number",
-            "answer": n, "tolerance": 0, "template": "games_over_40"}  # fmt: skip
+    return {
+        "question": f"In how many 2025-26 regular-season games did {name} score 40 or more points?",
+        "kind": "number",
+        "answer": n,
+        "tolerance": 0,
+        "template": "games_over_40",
+    }
 
 
 def count_25ppg(con, rng) -> dict:
@@ -138,8 +178,13 @@ def count_25ppg(con, rng) -> dict:
         "SELECT count(*) FROM player_season_stats WHERE season = ? AND gp >= 50 AND pts / gp >= 25",
         [season],
     )
-    return {"question": f"How many players averaged at least 25 points per game in {season} (minimum 50 games)?", "kind": "number",
-            "answer": n, "tolerance": 0, "template": "count_25ppg"}  # fmt: skip
+    return {
+        "question": f"How many players averaged at least 25 points per game in {season} (minimum 50 games)?",
+        "kind": "number",
+        "answer": n,
+        "tolerance": 0,
+        "template": "count_25ppg",
+    }
 
 
 def injury_status(con, rng) -> dict:
@@ -148,8 +193,13 @@ def injury_status(con, rng) -> dict:
         "SELECT r.player_name, i.status FROM injuries i JOIN rosters r USING (player_id) ORDER BY hash(r.player_name || ?) LIMIT 1",
         [salt(rng)],
     )
-    return {"question": f"What is {name}'s current injury status?", "kind": "text",
-            "answer": status, "aliases": [status.replace("-", " ")], "template": "injury_status"}  # fmt: skip
+    return {
+        "question": f"What is {name}'s current injury status?",
+        "kind": "text",
+        "answer": status,
+        "aliases": [status.replace("-", " ")],
+        "template": "injury_status",
+    }
 
 
 def top_projection(con, rng) -> dict:
@@ -159,8 +209,13 @@ def top_projection(con, rng) -> dict:
         "SELECT j.player_name, round(j.projected_ws, 1) FROM player_projections j JOIN players p USING (player_id) WHERE p.position = ? ORDER BY j.projected_ws DESC LIMIT 1",
         [pos],
     )
-    return {"question": f"Which player listed at position {pos} has the highest projected Win Shares for 2026-27?", "kind": "name",
-            "answer": name, "context_value": ws, "template": "top_projection"}  # fmt: skip
+    return {
+        "question": f"Which player listed at position {pos} has the highest projected Win Shares for 2026-27?",
+        "kind": "name",
+        "answer": name,
+        "context_value": ws,
+        "template": "top_projection",
+    }
 
 
 def clutch(con, rng) -> dict:
@@ -169,12 +224,29 @@ def clutch(con, rng) -> dict:
         """SELECT p.player_name, sum(e.points) pts FROM pbp_events e JOIN players p USING (player_id)
                            WHERE e.season = '2025-26' AND e.period >= 4 AND e.clock_seconds <= 300 GROUP BY 1 ORDER BY pts DESC LIMIT 1""",
     )
-    return {"question": "Who scored the most total points in the final five minutes of the fourth quarter or overtime during the 2025-26 regular season?",
-            "kind": "name", "answer": name, "context_value": pts, "template": "clutch"}  # fmt: skip
+    return {
+        "question": "Who scored the most total points in the final five minutes of the fourth quarter or overtime during the 2025-26 regular season?",
+        "kind": "name",
+        "answer": name,
+        "context_value": pts,
+        "template": "clutch",
+    }
 
 
-TEMPLATES = [leader, player_average, team_wins, best_net_rating, payroll, contract_salary, pick_owner,
-             games_over_40, count_25ppg, injury_status, top_projection, clutch]  # fmt: skip
+TEMPLATES = [
+    leader,
+    player_average,
+    team_wins,
+    best_net_rating,
+    payroll,
+    contract_salary,
+    pick_owner,
+    games_over_40,
+    count_25ppg,
+    injury_status,
+    top_projection,
+    clutch,
+]
 
 
 def build(con, n: int, seed: int) -> list[dict]:

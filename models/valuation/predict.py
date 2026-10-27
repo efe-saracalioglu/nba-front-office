@@ -139,19 +139,23 @@ def build_projections(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     proj["team_id"] = proj["team_id"].astype("Int64")
     for col in ("salary", "market_value", "surplus_value"):
         proj[col] = proj[col].astype("Int64")
-    cols = ["player_id", "player_name", "team_id", "based_on_season", "projected_season", "age_next",
-            "projected_ws", "ws_p10", "ws_p90", "salary", "market_value", "surplus_value", "top_factors",
-            "model_version"]  # fmt: skip
+    cols = [
+        "player_id",
+        "player_name",
+        "team_id",
+        "based_on_season",
+        "projected_season",
+        "age_next",
+        "projected_ws",
+        "ws_p10",
+        "ws_p90",
+        "salary",
+        "market_value",
+        "surplus_value",
+        "top_factors",
+        "model_version",
+    ]
     return proj[cols]
-
-
-def predict_player(con: duckdb.DuckDBPyConnection, player_id: int) -> dict | None:
-    row = con.execute("SELECT * FROM player_projections WHERE player_id = ?", [player_id]).df()
-    if row.empty:
-        return None
-    rec = json.loads(row.to_json(orient="records"))[0]
-    rec["top_factors"] = json.loads(rec["top_factors"])
-    return rec
 
 
 def main() -> None:

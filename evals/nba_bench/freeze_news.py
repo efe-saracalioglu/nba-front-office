@@ -16,8 +16,18 @@ def main() -> None:
            FROM injuries i JOIN rosters r USING (player_id) JOIN teams t ON t.team_id = r.team_id"""
     ).fetchall()
     con.close()
-    injuries = [{"player_name": n, "team": t, "status": s, "date": str(d), "comment": c, "detail": c, "source": src}
-                for n, t, s, d, c, src in rows]  # fmt: skip
+    injuries = [
+        {
+            "player_name": n,
+            "team": t,
+            "status": s,
+            "date": str(d),
+            "comment": c,
+            "detail": c,
+            "source": src,
+        }
+        for n, t, s, d, c, src in rows
+    ]
     cached = RAW_DIR / "news" / "espn_articles.json"
     articles = json.loads(cached.read_text(encoding="utf-8")) if cached.exists() else []
     OUT.mkdir(exist_ok=True)

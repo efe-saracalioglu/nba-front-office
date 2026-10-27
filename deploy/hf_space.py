@@ -77,8 +77,13 @@ def main() -> None:
             api.add_space_secret(args.space, "OLLAMA_API_KEY", key)
         else:
             print("OLLAMA_API_KEY is not set; add it as a Space secret before using the demo")
-        api.upload_folder(folder_path=tmp, repo_id=args.space, repo_type="space",
-                          commit_message="Deploy Front Office demo", delete_patterns=["*"])  # fmt: skip
+        api.upload_folder(
+            folder_path=tmp,
+            repo_id=args.space,
+            repo_type="space",
+            commit_message="Deploy Front Office demo",
+            delete_patterns=["*"],
+        )
     print(f"https://huggingface.co/spaces/{args.space}")
 
 

@@ -87,11 +87,16 @@ class Ledger:
     def _flag(self, t: PickTransfer, reason: str) -> None:
         self.review.append(
             {
-                "trade": t.trade_key, "year": t.year, "round": t.round,
-                "from": t.from_team, "to": t.to_team, "reason": reason,
-                "annotation": t.annotation, "text": t.text,
+                "trade": t.trade_key,
+                "year": t.year,
+                "round": t.round,
+                "from": t.from_team,
+                "to": t.to_team,
+                "reason": reason,
+                "annotation": t.annotation,
+                "text": t.text,
             }
-        )  # fmt: skip
+        )
 
     def _move(self, aid: str, t: PickTransfer, inferred: bool = False) -> None:
         asset = self.assets[aid]
@@ -105,10 +110,13 @@ class Ledger:
 
     def _held(self, t: PickTransfer, kinds: tuple[str, ...]) -> list[Asset]:
         held = [
-            a for a in self.assets.values()
-            if a.year == t.year and a.round == t.round and a.owner == t.from_team
+            a
+            for a in self.assets.values()
+            if a.year == t.year
+            and a.round == t.round
+            and a.owner == t.from_team
             and a.kind in kinds
-        ]  # fmt: skip
+        ]
         return sorted(held, key=lambda a: a.last_trade or "", reverse=True)
 
     def _create(self, t: PickTransfer, kind: str, originals: list[str], desc: str) -> str:
@@ -176,9 +184,15 @@ class Ledger:
         if "create" in override:
             spec = override["create"]
             self.assets[aid] = Asset(
-                aid, t.year, t.round, t.from_team, spec["kind"], spec["originals"],
-                spec.get("description", ""), spec.get("protection"),
-            )  # fmt: skip
+                aid,
+                t.year,
+                t.round,
+                t.from_team,
+                spec["kind"],
+                spec["originals"],
+                spec.get("description", ""),
+                spec.get("protection"),
+            )
         if aid not in self.assets:
             self._flag(t, f"override refers to unknown asset {aid}")
             return
@@ -189,17 +203,21 @@ class Ledger:
         for a in self.assets.values():
             rows.append(
                 {
-                    "asset_id": a.asset_id, "year": a.year, "round": a.round,
+                    "asset_id": a.asset_id,
+                    "year": a.year,
+                    "round": a.round,
                     "owner_team_id": config.BBREF_TO_TEAM_ID[a.owner],
                     "original_team_id": (
                         config.BBREF_TO_TEAM_ID[a.originals[0]] if len(a.originals) == 1 else None
                     ),
                     "original_teams": ",".join(bbref_abbr_to_nba(o) for o in a.originals),
-                    "kind": a.kind, "description": a.description,
-                    "protection": a.protection, "last_trade": a.last_trade,
+                    "kind": a.kind,
+                    "description": a.description,
+                    "protection": a.protection,
+                    "last_trade": a.last_trade,
                     "inferred": a.inferred,
                 }
-            )  # fmt: skip
+            )
         df = pd.DataFrame(rows)
         df["original_team_id"] = df["original_team_id"].astype("Int64")
         return df.sort_values(["year", "round", "asset_id"]).reset_index(drop=True)
@@ -243,8 +261,12 @@ def main() -> None:
     ).to_csv(REVIEW_CSV, index=False)
     log.info(
         "%d assets, %d transfers applied window %s; %d items to review -> %s",
-        len(ledger.assets), len(transfers), list(draft_window()), len(ledger.review), REVIEW_CSV,
-    )  # fmt: skip
+        len(ledger.assets),
+        len(transfers),
+        list(draft_window()),
+        len(ledger.review),
+        REVIEW_CSV,
+    )
 
 
 if __name__ == "__main__":

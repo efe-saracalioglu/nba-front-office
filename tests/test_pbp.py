@@ -5,15 +5,31 @@ from data.sources.pbp_archive import clock_to_seconds, transform
 
 def _event(n, period, clock, action, desc, pid=1, value=0, home=None, away=None):
     return {
-        "gameId": 22500001, "actionNumber": n, "clock": clock, "period": period,
-        "teamId": 1610612760, "teamTricode": "OKC", "personId": pid, "playerName": "X",
-        "playerNameI": "X", "xLegacy": 0, "yLegacy": 0, "shotDistance": 0,
+        "gameId": 22500001,
+        "actionNumber": n,
+        "clock": clock,
+        "period": period,
+        "teamId": 1610612760,
+        "teamTricode": "OKC",
+        "personId": pid,
+        "playerName": "X",
+        "playerNameI": "X",
+        "xLegacy": 0,
+        "yLegacy": 0,
+        "shotDistance": 0,
         "shotResult": "Made" if action == "Made Shot" else None,
         "isFieldGoal": int(action in ("Made Shot", "Missed Shot")),
-        "scoreHome": home, "scoreAway": away, "pointsTotal": 0, "location": "h",
-        "description": desc, "actionType": action, "subType": None, "videoAvailable": 1,
-        "shotValue": value, "actionId": n,
-    }  # fmt: skip
+        "scoreHome": home,
+        "scoreAway": away,
+        "pointsTotal": 0,
+        "location": "h",
+        "description": desc,
+        "actionType": action,
+        "subType": None,
+        "videoAvailable": 1,
+        "shotValue": value,
+        "actionId": n,
+    }
 
 
 RAW = pd.DataFrame(

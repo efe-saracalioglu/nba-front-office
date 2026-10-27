@@ -57,13 +57,17 @@ def test_name_match_carries_across_seasons():
 
 def test_same_name_same_season_is_not_guessed_by_name():
     bbref = _bbref(
-        [("willima01", "Marcus Williams", "2012-13", 5, 40),
-         ("willima02", "Marcus Williams", "2012-13", 60, 1500)]
-    )  # fmt: skip
+        [
+            ("willima01", "Marcus Williams", "2012-13", 5, 40),
+            ("willima02", "Marcus Williams", "2012-13", 60, 1500),
+        ]
+    )
     nba = _nba(
-        [(10, "Marcus Williams", "2012-13", 60, 1500.2),
-         (11, "Marcus Williams", "2012-13", 5, 39.9)]
-    )  # fmt: skip
+        [
+            (10, "Marcus Williams", "2012-13", 60, 1500.2),
+            (11, "Marcus Williams", "2012-13", 5, 39.9),
+        ]
+    )
     xw = build_crosswalk(bbref, nba).set_index("bbref_id")
     assert xw.loc["willima01", "player_id"] == 11
     assert xw.loc["willima02", "player_id"] == 10
