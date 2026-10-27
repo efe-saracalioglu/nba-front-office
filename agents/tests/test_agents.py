@@ -185,3 +185,44 @@ def test_structured_output_unwraps_schema_echo():
 
     assert _validate(S, {"properties": {"score": 4}}).score == 4
     assert _validate(S, {"score": 2}).score == 2
+
+
+class FixedWS:
+    def __init__(self, ws):
+        self.values = ws
+
+    def ws(self, name, team=None):
+        return self.values[name]
+
+
+def test_counterparty_wants_firsts_for_the_talent_it_loses():
+    valuer = FixedWS({"Star": 7.0, "Role A": 1.5, "Role B": 1.0, "Starter": 5.5})
+    send = [{"name": "Role A"}, {"name": "Role B"}]
+    veteran = {"player_name": "Star", "team": "CLE", "age": 30}
+    young = veteran | {"age": 23}
+    assert cap_analyst.required_first_round_picks(valuer, veteran, send, "BOS") == 4
+    assert cap_analyst.required_first_round_picks(valuer, young, send, "BOS") == 6
+    even = [{"name": "Starter"}, {"name": "Role A"}]
+    assert cap_analyst.required_first_round_picks(valuer, veteran, even, "BOS") == 0
+
+
+def test_no_firsts_brief_keeps_first_round_picks_out(deps):
+    d = deps()
+    goal = GOAL | {"trade_first_round_picks": False}
+    candidates, _ = stats_analyst.find_candidates(d, goal)
+    props, _ = cap_analyst.propose(d, goal, candidates, {}, "2026-12-20")
+    assert all(p["round"] != 1 for prop in props for p in prop["send_picks"])
+
+
+def test_memo_fact_sheet_states_the_payroll_line():
+    from agents.specialists import fact_sheet
+
+    prop = {"id": "P1", "receive": {"name": "X", "salary": 10e6, "projected_ws": 4.0}, "from_team": "OKC",
+            "send_players": [], "send_picks": [],
+            "value": {"ws_change_for_us": 1.0, "our_value_change": 0, "counterparty_value_change": 0},
+            "validation": {"teams": [{"team": "BOS", "payroll_before": 200e6, "payroll_after": 205e6,
+                                      "status_after": "over_tax", "hard_cap": "first_apron", "standard_roster_after": 14}]}}  # fmt: skip
+    sheet = fact_sheet(prop, "BOS", {}, ("first_apron", 209_015_000))
+    assert "below it, as the brief requires" in sheet["payroll_line"]
+    assert "does not exceed the first apron" in sheet["hard_cap"]
+    assert "NOT below" in fact_sheet(prop, "BOS", {}, ("luxury_tax", 200_428_000))["payroll_line"]

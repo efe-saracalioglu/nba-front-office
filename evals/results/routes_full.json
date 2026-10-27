@@ -1,0 +1,10 @@
+{
+  "config": "full",
+  "requests": 108,
+  "accuracy": 1.0,
+  "confusion": {
+    "stats_question -> stats_question": 84,
+    "trade_search -> trade_search": 24
+  },
+  "misrouted": []
+}

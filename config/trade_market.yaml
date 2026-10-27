@@ -10,3 +10,7 @@ proposals_to_keep: 3
 max_contract_years: 3
 star_threshold_ws: 6.0
 star_premium_per_ws: 5000000
+counterparty_max_ws_loss: 1.0
+ws_per_first_round_pick: 1.0
+young_player_age: 25
+young_ws_loss_multiplier: 1.5

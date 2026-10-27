@@ -1,0 +1,48 @@
+{
+  "replies": 96,
+  "groups": {
+    "empty_or_error": {
+      "n": 10,
+      "goal_fit": 1,
+      "realism": 1,
+      "grounding": 1,
+      "risk_awareness": 1,
+      "overall": 1
+    },
+    "no_trade_reply": {
+      "n": 29,
+      "goal_fit": 3.55,
+      "realism": 3.31,
+      "grounding": 2.76,
+      "risk_awareness": 3.07,
+      "overall": 2.79
+    },
+    "all_pass": {
+      "n": 40,
+      "goal_fit": 4.58,
+      "realism": 2.25,
+      "grounding": 3.9,
+      "risk_awareness": 3.15,
+      "overall": 2.8
+    },
+    "some_fail": {
+      "n": 17,
+      "goal_fit": 3.47,
+      "realism": 1.12,
+      "grounding": 2.94,
+      "risk_awareness": 1.18,
+      "overall": 1.41
+    }
+  },
+  "empty_scored_1": 1.0,
+  "auc_all_pass_vs_some_fail": {
+    "goal_fit": 0.715,
+    "grounding": 0.657,
+    "overall": 0.837
+  },
+  "spearman_pass_share_vs_goal_fit": 0.413,
+  "worsens_us": {
+    "n": 6,
+    "goal_fit": 3.33
+  }
+}

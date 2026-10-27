@@ -1,27 +1,31 @@
 from __future__ import annotations
 
 import json
+import random
+import statistics
 from pathlib import Path
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from scipy.stats import binomtest, wilcoxon
 
 from data.config import ROOT
-from evals.harness import RESULTS, configs
+from evals.harness import RESULTS, configs, load_jsonl
 
 FIG = ROOT / "docs" / "figures"
 REPORT = RESULTS / "REPORT.md"
 INK, MUTED, GRID, BASE = "#1b1f24", "#7a7f86", "#e3e3dc", "#c4c4ba"
 COLORS = {
+    "fixed": "#0b3f8a",
     "full": "#2a78d6",
     "single_agent": "#eb6834",
     "no_devils_advocate": "#1baf7a",
     "small_models": "#eda100",
     "no_sql_correction": "#6250d6",
 }
-LABELS = {"full": "Multi-agent (shipped)", "single_agent": "Single agent", "no_devils_advocate": "No devil's advocate",
+LABELS = {"fixed": "Multi-agent v2 (after fixes)", "full": "Multi-agent v1", "single_agent": "Single agent", "no_devils_advocate": "No devil's advocate",
           "small_models": "All 20B models", "no_sql_correction": "No SQL self-correction"}  # fmt: skip
 
 plt.rcParams.update({
@@ -37,10 +41,15 @@ def _load(path: Path) -> dict | None:
 
 def summaries(suite: str) -> dict[str, dict]:
     out = {}
+    v1 = RESULTS / "before_fixes" / suite / "full_summary.json"
     for cfg in configs():
-        s = _load(RESULTS / suite / f"{cfg}_summary.json")
+        path = v1 if cfg == "full" and v1.exists() else RESULTS / suite / f"{cfg}_summary.json"
+        s = _load(path)
         if s:
             out[cfg] = s
+    fixed = _load(RESULTS / suite / "full_summary.json")
+    if v1.exists() and fixed:
+        out = {"fixed": fixed, **out}
     return out
 
 
@@ -57,7 +66,11 @@ def _hbar(
 def fig_scenarios(sc: dict) -> list[str]:
     if not sc:
         return []
-    order = [c for c in ("full", "no_devils_advocate", "small_models", "single_agent") if c in sc]
+    order = [
+        c
+        for c in ("fixed", "full", "no_devils_advocate", "small_models", "single_agent")
+        if c in sc
+    ]
     names = [LABELS[c] for c in order]
     colors = [COLORS[c] for c in order]
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.2))
@@ -99,7 +112,9 @@ def fig_scenarios(sc: dict) -> list[str]:
 def fig_exact(ex: dict) -> list[str]:
     if not ex:
         return []
-    order = [c for c in ("full", "no_sql_correction", "small_models", "single_agent") if c in ex]
+    order = [
+        c for c in ("fixed", "full", "no_sql_correction", "small_models", "single_agent") if c in ex
+    ]
     fig, ax = plt.subplots(figsize=(6.4, 2.6))
     _hbar(
         ax,
@@ -168,7 +183,9 @@ def fig_llm_vs_rules(lv: dict) -> list[str]:
     return ["llm_vs_rules.png"]
 
 
-def markdown(ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None) -> str:
+def markdown(
+    ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None, jv: dict | None = None
+) -> str:
     lines = ["# NBA-Bench results", ""]
     if lv:
         lines += ["## Rules engine vs LLMs (100 trades)", "", "| Judge | Exact | Verdict right | Approves illegal trades | Rejects legal trades | Seconds |", "|---|---|---|---|---|---|",
@@ -182,6 +199,8 @@ def markdown(ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None)
         lines += [
             "## Exact-answer layer",
             "",
+            "Ablation rows (v1 and its variants) share one system version; v2 is the shipped system after the fixes below.",
+            "",
             "| Config | Accuracy | Routed to stats | SQL right first try | Avg seconds | Avg tokens |",
             "|---|---|---|---|---|---|",
         ]
@@ -192,6 +211,7 @@ def markdown(ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None)
         lines.append("")
     if sc:
         lines += ["## Open-ended trade scenarios", "",
+                  "Ablation rows (v1 and its variants) share one system version; v2 is the shipped system after the fixes below.", "",
                   "| Config | Judge overall | Goal fit | Realism | Grounding | Risk | Proposals legal | Pass every check | Avg seconds | Avg tokens | $ / request |",
                   "|---|---|---|---|---|---|---|---|---|---|---|"]  # fmt: skip
         for c, s in sc.items():
@@ -213,6 +233,22 @@ def markdown(ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None)
                     f"| {a.replace('_', ' ')} | {u['attack_success_rate']:.0%} | {d['attack_success_rate']:.0%} | {d['flagged_rate']:.0%} |"
                 )
         lines.append("")
+    if jv:
+        g = jv["groups"]
+        names = {"empty_or_error": "Empty reply or crash", "no_trade_reply": "No trade proposed",
+                 "all_pass": "Every proposal passes every check", "some_fail": "Some proposal fails a check"}  # fmt: skip
+        lines += ["## Judge checked against deterministic checks", "",
+                  f"All {jv['replies']} scenario replies, grouped by what the rules engine and constraint checks found.", "",
+                  "| Group | n | Goal fit | Realism | Grounding | Risk | Overall |", "|---|---|---|---|---|---|---|"]  # fmt: skip
+        for k, label in names.items():
+            if k in g:
+                v = g[k]
+                lines.append(
+                    f"| {label} | {v['n']} | {v['goal_fit']:.2f} | {v['realism']:.2f} | {v['grounding']:.2f} | {v['risk_awareness']:.2f} | {v['overall']:.2f} |"
+                )
+        a = jv["auc_all_pass_vs_some_fail"]
+        lines += ["", f"Empty replies scored 1: {jv['empty_scored_1']:.0%}. Probability the judge ranks a fully passing reply above one with a failing proposal (AUC): "
+                  f"overall {a['overall']}, goal fit {a['goal_fit']}, grounding {a['grounding']}.", ""]  # fmt: skip
     if agree:
         lines += [
             "## Judge vs human labels",
@@ -228,6 +264,65 @@ def markdown(ex: dict, sc: dict, inj: dict | None, lv: dict, agree: dict | None)
     return "\n".join(lines)
 
 
+def _rows(path: Path) -> dict[str, dict]:
+    return {r["id"]: r for r in load_jsonl(path)} if path.exists() else {}
+
+
+def paired(before: list[float], after: list[float], seed: int = 0) -> dict:
+    diff = [a - b for a, b in zip(after, before, strict=True)]
+    rng = random.Random(seed)
+    boots = sorted(statistics.mean(rng.choices(diff, k=len(diff))) for _ in range(10_000))
+    nonzero = [d for d in diff if d]
+    return {"mean_diff": round(statistics.mean(diff), 2), "ci95": [round(boots[249], 2), round(boots[9749], 2)],
+            "p": round(float(wilcoxon(nonzero).pvalue), 3) if len(nonzero) > 1 else None,
+            "up": sum(d > 0 for d in diff), "down": sum(d < 0 for d in diff)}  # fmt: skip
+
+
+def before_after() -> dict | None:
+    old = RESULTS / "before_fixes"
+    ex_b, ex_a = _rows(old / "exact" / "full.jsonl"), _rows(RESULTS / "exact" / "full.jsonl")
+    sc_b, sc_a = (
+        _rows(old / "scenarios" / "full.jsonl"),
+        _rows(RESULTS / "scenarios" / "full.jsonl"),
+    )
+    if not (ex_b and ex_a and sc_b and sc_a):
+        return None
+    fixed = sum(not ex_b[i]["correct"] and ex_a[i]["correct"] for i in ex_a if i in ex_b)
+    broke = sum(ex_b[i]["correct"] and not ex_a[i]["correct"] for i in ex_a if i in ex_b)
+    ids = sorted(set(sc_b) & set(sc_a))
+    return {
+        "exact": {"before": _load(old / "exact" / "full_summary.json")["accuracy"],
+                  "after": _load(RESULTS / "exact" / "full_summary.json")["accuracy"],
+                  "fixed": fixed, "broke": broke,
+                  "mcnemar_p": round(float(binomtest(broke, fixed + broke, 0.5).pvalue), 4) if fixed + broke else None},
+        "scenarios": {d: paired([sc_b[i]["judge"][d] for i in ids], [sc_a[i]["judge"][d] for i in ids])
+                      for d in ("overall", "goal_fit", "realism", "grounding", "risk_awareness")},
+        "pass_all": [_load(old / "scenarios" / "full_summary.json")["proposal_pass_all_rate"],
+                     _load(RESULTS / "scenarios" / "full_summary.json")["proposal_pass_all_rate"]],
+        "n_scenarios": len(ids),
+    }  # fmt: skip
+
+
+def before_after_markdown(ba: dict) -> list[str]:
+    e = ba["exact"]
+    lines = ["## System fixes: before vs after", "",
+             "Fixes: factual one-player questions routed to the SQL analyst with their own prompt, a salary ceiling for backup and cheap targets, "
+             "first-round picks required for the talent a counterparty gives up, and unambiguous payroll and hard-cap lines in the memo fact sheet.", "",
+             f"Exact answers: {e['before']:.1%} -> {e['after']:.1%} ({e['fixed']} questions fixed, {e['broke']} broken; exact McNemar p = {e['mcnemar_p']}).", "",
+             f"Scenarios, paired over {ba['n_scenarios']} requests, one run each; proposals passing every check {ba['pass_all'][0]:.0%} -> {ba['pass_all'][1]:.0%}:", "",
+             "| Judge dimension | Mean change | 95% bootstrap CI | Wilcoxon p | Better / worse |", "|---|---|---|---|---|"]  # fmt: skip
+    for d, s in ba["scenarios"].items():
+        lines.append(
+            f"| {d.replace('_', ' ')} | {s['mean_diff']:+.2f} | [{s['ci95'][0]:+.2f}, {s['ci95'][1]:+.2f}] | {s['p']} | {s['up']} / {s['down']} |"
+        )
+    lines += [
+        "",
+        "The scenario gains are not distinguishable from run-to-run noise at this sample size; the exact-answer gain is.",
+        "",
+    ]
+    return lines
+
+
 def main() -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     ex, sc = summaries("exact"), summaries("scenarios")
@@ -235,7 +330,13 @@ def main() -> None:
     lv = llm_vs_rules()
     agree = _load(ROOT / "evals" / "human_labels" / "agreement.json")
     figs = fig_scenarios(sc) + fig_exact(ex) + fig_injection(inj) + fig_llm_vs_rules(lv)
-    REPORT.write_text(markdown(ex, sc, inj, lv, agree), encoding="utf-8")
+    jv = _load(RESULTS / "judge_validation.json")
+    text = markdown(ex, sc, inj, lv, agree, jv)
+    ba = before_after()
+    if ba:
+        (RESULTS / "before_after.json").write_text(json.dumps(ba, indent=2), encoding="utf-8")
+        text += "\n" + "\n".join(before_after_markdown(ba))
+    REPORT.write_text(text, encoding="utf-8")
     print(f"wrote {REPORT} and {len(figs)} figures: {figs}")
 
 

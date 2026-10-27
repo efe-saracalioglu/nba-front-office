@@ -13,7 +13,7 @@ FALLBACK_SQL = """
 SELECT p.player_name, t.abbreviation AS team, p.position, j.age_next AS age, j.projected_ws, j.salary
 FROM player_projections j JOIN players p USING (player_id) JOIN teams t ON t.team_id = j.team_id
 WHERE t.abbreviation <> '{team}' AND j.salary IS NOT NULL AND p.position IN ({positions})
-  AND j.age_next <= {max_age} AND j.projected_ws >= {min_ws}
+  AND j.age_next <= {max_age} AND j.projected_ws >= {min_ws} AND j.salary <= {max_salary}
 ORDER BY j.projected_ws DESC LIMIT 15
 """
 
@@ -41,9 +41,13 @@ def _check(result: dict) -> str | None:
 
 
 def sql_loop(
-    deps: Deps, task: str, check=_check, tables: list[str] | None = None
+    deps: Deps,
+    task: str,
+    check=_check,
+    tables: list[str] | None = None,
+    system_prompt: str = "stats_analyst",
 ) -> tuple[list[dict], list[dict]]:
-    system = prompt("stats_analyst")
+    system = prompt(system_prompt)
     context = _context(deps, tables)
     attempts, feedback = [], ""
     max_attempts = MAX_ATTEMPTS if deps.sql_self_correction else 1
@@ -69,13 +73,14 @@ def find_candidates(deps: Deps, goal: dict) -> tuple[list[dict], list[dict]]:
     task = (
         f"Brief: {json.dumps(goal)}\n"
         f"Find trade targets for {goal['team']}: positions {goal['positions']}, age at most {goal['max_age']}, "
-        f"projected_ws at least {goal['min_projected_ws']}."
+        f"projected_ws at least {goal['min_projected_ws']}"
+        + (f", salary at most {goal['max_salary']}." if goal.get("max_salary") else ".")
     )
     rows, attempts = sql_loop(deps, task, tables=["player_projections", "players", "teams"])
     if not rows:
         sql = FALLBACK_SQL.format(
             team=goal["team"], positions=", ".join(f"'{p}'" for p in goal["positions"]),
-            max_age=goal["max_age"], min_ws=goal["min_projected_ws"],
+            max_age=goal["max_age"], min_ws=goal["min_projected_ws"], max_salary=goal.get("max_salary") or 10**10,
         )  # fmt: skip
         rows = _rows_to_dicts(deps.tools.call("run_sql", query=sql))
         attempts.append({"attempt": "fallback", "sql": sql, "ok": bool(rows), "problem": None})
@@ -92,7 +97,10 @@ def find_candidates(deps: Deps, goal: dict) -> tuple[list[dict], list[dict]]:
 def answer_question(deps: Deps, question: str) -> tuple[str, list[dict]]:
     task = f"Answer this question with one SELECT: {question}\nReturn whatever columns answer it; LIMIT 25."
     rows, attempts = sql_loop(
-        deps, task, check=lambda r: None if r["rows"] else "The query returned no rows."
+        deps,
+        task,
+        check=lambda r: None if r["rows"] else "The query returned no rows.",
+        system_prompt="stats_question",
     )
     data = json.dumps(
         {"question": question, "rows": rows[:25], "sql": attempts[-1]["sql"] if attempts else None}

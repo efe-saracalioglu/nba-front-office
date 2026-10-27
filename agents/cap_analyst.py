@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections import Counter
 from dataclasses import dataclass, field
 
@@ -77,6 +78,19 @@ def _rank(p: dict) -> tuple[float, float]:
     return (p["value"]["ws_change_for_us"], p["value"]["our_value_change"])
 
 
+def required_first_round_picks(valuer: Valuer, target: dict, send: list[dict], team: str) -> int:
+    cfg = market()
+    loss = valuer.ws(target["player_name"], target["team"]) - sum(
+        valuer.ws(p["name"], team) for p in send
+    )
+    age = target.get("age")
+    if age is not None and age <= cfg["young_player_age"]:
+        loss *= cfg["young_ws_loss_multiplier"]
+    return max(
+        0, math.ceil((loss - cfg["counterparty_max_ws_loss"]) / cfg["ws_per_first_round_pick"])
+    )
+
+
 def _payroll_line(cap_sheet: dict, line: str) -> int | None:
     if line == "none":
         return None
@@ -89,9 +103,19 @@ def build_package(deps: Deps, valuer: Valuer, goal: dict, target: dict, send: li
     team, other = goal["team"], target["team"]
     target_surplus = valuer.surplus(target["player_name"], other)
     players_value = sum(valuer.surplus(p["name"], team) for p in send)
-    chosen: list[dict] = []
-    gap = players_value - target_surplus
     pool = list(picks_pool)
+    firsts = required_first_round_picks(valuer, target, send, team)
+    if firsts > cfg["max_sweetener_picks"]:
+        return f"{other} would not give up that much talent for picks we can offer"
+    chosen = [p for p in pool if p["round"] == 1][:firsts]
+    if len(chosen) < firsts:
+        if not goal.get("trade_first_round_picks", True):
+            return f"{other} would want first-round picks for the talent it loses, and the brief rules them out"
+        return (
+            f"{other} would want more first-round picks for the talent it loses than we can trade"
+        )
+    pool = [p for p in pool if p not in chosen]
+    gap = players_value + sum(pick_value(p) for p in chosen) - target_surplus
     while (
         (gap < -cfg["counterparty_tolerance"] or len(chosen) < extra_picks)
         and pool
@@ -148,6 +172,7 @@ def build_package(deps: Deps, valuer: Valuer, goal: dict, target: dict, send: li
             "counterparty_value_change": round(players_value + picks_value - target_surplus),
             "ws_change_for_us": round(valuer.ws(target["player_name"], other) - sum(valuer.ws(p["name"], team) for p in send), 2),
             "picks_value_assumed": round(picks_value),
+            "first_round_picks_for_talent": firsts,
         },
         "validation": {"valid": True, "teams": verdict["teams"], "warnings": [w["message"] for w in verdict["warnings"]]},
         "legs": legs,
@@ -163,6 +188,8 @@ def propose(deps: Deps, goal: dict, candidates: list[dict], scouting: dict, trad
     cap_sheet = deps.tools.call("get_team_cap_sheet", team=team)
     assets = deps.tools.call("get_draft_assets", team=team)
     picks_pool = tradable_picks(assets, goal.get("protected_picks", []))
+    if not goal.get("trade_first_round_picks", True):
+        picks_pool = [p for p in picks_pool if p["round"] != 1]
     line_value = _payroll_line(cap_sheet, goal.get("stay_below", "none"))
     untouchable = {u.lower() for u in goal.get("untouchable_players", [])}
     extra_picks = extra_picks or {}

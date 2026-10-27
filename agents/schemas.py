@@ -23,12 +23,19 @@ class TeamGoal(BaseModel):
         default=3.0, description="Minimum projected Win Shares for a target"
     )
     max_age: int = Field(default=33)
+    max_salary: int | None = Field(
+        default=None,
+        description="Highest salary in dollars the team wants to take on, for backup, bench or cheap targets",
+    )
     stay_below: Literal["none", "luxury_tax", "first_apron", "second_apron"] = Field(
         default="none", description="Payroll line the team must stay below after the trade"
     )
     protected_picks: list[str] = Field(
         default_factory=list,
         description="Draft years or asset ids the team will not trade, e.g. ['2029'] or ['2029-1-BOS']",
+    )
+    trade_first_round_picks: bool = Field(
+        default=True, description="False when the request rules out giving up first-round picks"
     )
     untouchable_players: list[str] = Field(default_factory=list)
     timeline: Literal["win_now", "balanced", "rebuild"] = "balanced"
