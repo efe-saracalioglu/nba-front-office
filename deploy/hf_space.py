@@ -29,8 +29,7 @@ A team of AI analysts that proposes NBA trades. A deterministic CBA rules engine
 LightGBM model values the players, and you approve or reject each proposal as the general manager.
 
 This Space runs on a small sample of the warehouse and allows {limit} requests per session.
-Source code, evals and the full write-up: {repo}
-"""
+{repo}"""
 
 
 def tracked_files() -> list[str]:
@@ -46,7 +45,8 @@ def stage(target: Path, limit: int, repo: str) -> int:
         shutil.copy2(ROOT / f, dest)
     project_readme = (ROOT / "README.md").read_text(encoding="utf-8")
     (target / "PROJECT_README.md").write_text(project_readme, encoding="utf-8")
-    (target / "README.md").write_text(FRONT_MATTER.format(limit=limit, repo=repo), encoding="utf-8")
+    link = f"Source code, evals and the full write-up: {repo}\n" if repo else ""
+    (target / "README.md").write_text(FRONT_MATTER.format(limit=limit, repo=link), encoding="utf-8")
     return len(files)
 
 
@@ -54,9 +54,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Publish the demo as a Hugging Face Docker Space")
     parser.add_argument("space", help="owner/name of the Space, e.g. efesaracalioglu/front-office")
     parser.add_argument("--limit", type=int, default=3, help="Requests allowed per browser session")
-    parser.add_argument(
-        "--repo", default="https://github.com/", help="Link to the source repository"
-    )
+    parser.add_argument("--repo", default="", help="Link to the source repository")
     parser.add_argument("--private", action="store_true")
     parser.add_argument("--dry-run", action="store_true", help="Stage the files and stop")
     args = parser.parse_args()

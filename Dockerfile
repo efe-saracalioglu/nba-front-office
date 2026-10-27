@@ -10,6 +10,7 @@ ENV UV_COMPILE_BYTECODE=1 \
     PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     FRONT_OFFICE_CHECKPOINTS=/home/user/state/checkpoints.sqlite \
+    FRONT_OFFICE_NEWS_CACHE=/home/user/state/news \
     PORT=8501
 
 WORKDIR /app
