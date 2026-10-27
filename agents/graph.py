@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sqlite3
 from datetime import date
 from pathlib import Path
@@ -14,7 +15,7 @@ from agents.state import FrontOfficeState
 from agents.tracing import traced_node
 from data.config import DATA_DIR
 
-CHECKPOINTS = DATA_DIR / "checkpoints.sqlite"
+CHECKPOINTS = Path(os.environ.get("FRONT_OFFICE_CHECKPOINTS", DATA_DIR / "checkpoints.sqlite"))
 MAX_REVISIONS = 1
 
 

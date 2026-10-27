@@ -1,0 +1,42 @@
+name: front-office
+
+x-common: &common
+  image: front-office:latest
+  restart: unless-stopped
+  extra_hosts:
+    - host.docker.internal:host-gateway
+  volumes:
+    - ./data:/warehouse:ro
+  environment: &env
+    FRONT_OFFICE_DB: ${FRONT_OFFICE_DOCKER_DB:-/app/data/sample/warehouse_sample.duckdb}
+    OLLAMA_URL: ${FRONT_OFFICE_DOCKER_OLLAMA_URL:-http://host.docker.internal:11434}
+    OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+    LANGFUSE_HOST: ${FRONT_OFFICE_DOCKER_LANGFUSE_HOST:-http://host.docker.internal:3000}
+    LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+    LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+
+services:
+  app:
+    <<: *common
+    build: .
+    ports:
+      - 127.0.0.1:8501:8501
+    environment:
+      <<: *env
+      FRONT_OFFICE_DEMO_LIMIT: ${FRONT_OFFICE_DEMO_LIMIT:-0}
+    volumes:
+      - ./data:/warehouse:ro
+      - state:/home/user/state
+
+  mcp:
+    <<: *common
+    pull_policy: never
+    depends_on: [app]
+    ports:
+      - 127.0.0.1:8765:8765
+    command: ["python", "-m", "mcp_server.server", "--transport", "http", "--host", "0.0.0.0", "--port", "8765"]
+    healthcheck:
+      disable: true
+
+volumes:
+  state:

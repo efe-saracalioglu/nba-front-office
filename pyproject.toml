@@ -26,6 +26,7 @@ dependencies = [
     "langgraph>=1.2.16",
     "langgraph-checkpoint-sqlite>=3.1.2",
     "langfuse>=5.0.3",
+    "streamlit>=1.50",
 ]
 
 [dependency-groups]
@@ -36,6 +37,7 @@ dev = [
     "nbformat>=5.11.1",
     "nbconvert>=7.17.2",
     "ipykernel>=7.4.0",
+    "huggingface-hub>=2.2.0",
 ]
 
 [build-system]
@@ -59,7 +61,9 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 "evals/**" = ["E501"]  # prompts and case fixtures
 "models/**" = ["E501"]  # SQL and feature labels
 "mcp_server/**" = ["E501"]  # tool descriptions read by LLMs
+"deploy/**" = ["E501"]  # Space page copy
 "agents/**" = ["E501"]  # prompts and fact sheets
+"app/**" = ["E501"]  # UI copy
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "rules/tests", "models/tests", "mcp_server/tests", "agents/tests"]

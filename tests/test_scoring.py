@@ -116,5 +116,10 @@ def test_check_handles_empty_answer():
 
 
 def test_check_accepts_unicode_dashes():
-    item = {"kind": "text", "question": "Status?", "answer": "Day-To-Day", "aliases": ["Day To Day"]}
+    item = {
+        "kind": "text",
+        "question": "Status?",
+        "answer": "Day-To-Day",
+        "aliases": ["Day To Day"],
+    }
     assert check(item, "Collin Sexton’s current injury status is Day‑To‑Day.")[0]
