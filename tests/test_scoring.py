@@ -123,3 +123,11 @@ def test_check_accepts_unicode_dashes():
         "aliases": ["Day To Day"],
     }
     assert check(item, "Collin Sexton’s current injury status is Day‑To‑Day.")[0]
+
+
+def test_markdown_bold_does_not_hide_a_match():
+    item = {"kind": "name", "answer": "Nikola Jokić"}
+    assert check(item, "The center is **Nikola Jokić**, projected at 11.5 WS.")[0]
+    status = {"kind": "text", "answer": "Day-To-Day", "aliases": ["Day To Day"]}
+    assert check(status, "He is listed as **Day‑To‑Day** with a shoulder issue.")[0]
+    assert not check({"kind": "name", "answer": "Jalen Williams"}, "**Jaylin Williams**")[0]

@@ -1,0 +1,26 @@
+{
+  "config": "single_agent",
+  "scenarios": 24,
+  "with_proposals": 16,
+  "proposals": 33,
+  "proposal_legal_rate": 0.939,
+  "proposal_pass_all_rate": 0.061,
+  "failed_checks": {
+    "counterparty_realism": 19,
+    "improves_us": 9,
+    "position_fit": 6,
+    "legal": 2
+  },
+  "judge_mean": {
+    "goal_fit": 2.96,
+    "realism": 1.08,
+    "grounding": 2.21,
+    "risk_awareness": 1.12,
+    "overall": 1.25
+  },
+  "errors": 6,
+  "avg_seconds": 87.5,
+  "avg_tokens": 110211,
+  "avg_usd_list_price": 0.02026,
+  "avg_tool_calls": 17.0
+}

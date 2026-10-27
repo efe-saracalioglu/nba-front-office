@@ -1,0 +1,21 @@
+{
+  "config": "full",
+  "scenarios": 24,
+  "with_proposals": 16,
+  "proposals": 30,
+  "proposal_legal_rate": 1.0,
+  "proposal_pass_all_rate": 1.0,
+  "failed_checks": {},
+  "judge_mean": {
+    "goal_fit": 4,
+    "realism": 2.54,
+    "grounding": 3.67,
+    "risk_awareness": 4.08,
+    "overall": 2.79
+  },
+  "errors": 0,
+  "avg_seconds": 60.6,
+  "avg_tokens": 16336,
+  "avg_usd_list_price": 0.00468,
+  "avg_tool_calls": 158.5
+}

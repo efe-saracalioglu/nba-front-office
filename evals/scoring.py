@@ -25,9 +25,15 @@ def numbers(text: str) -> list[float]:
 _DASHES = dict.fromkeys(map(ord, "‐‑‒–—−"), "-")
 
 
+_PUNCT = re.compile(r"[^a-z0-9 ]+")
+
+
+def _words(text: str) -> str:
+    return " ".join(_PUNCT.sub(" ", normalize_name(text.translate(_DASHES))).split())
+
+
 def _contains(answer: str, phrase: str) -> bool:
-    answer, phrase = answer.translate(_DASHES), phrase.translate(_DASHES)
-    a, p = f" {normalize_name(answer)} ", f" {normalize_name(phrase)} "
+    a, p = f" {_words(answer)} ", f" {_words(phrase)} "
     return p.strip() != "" and p in a
 
 

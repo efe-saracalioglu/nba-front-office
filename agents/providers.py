@@ -16,6 +16,8 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL") or (
     "https://ollama.com" if OLLAMA_API_KEY else "http://localhost:11434"
 )
 
+MAX_OUTPUT_TOKENS = 8192
+
 
 def ollama_request(model: str) -> tuple[str, dict]:
     if OLLAMA_API_KEY and "ollama.com" in OLLAMA_URL:
@@ -36,7 +38,7 @@ def _ollama(model: str, system: str, user: str, json_mode: bool, timeout: float)
     body = {
         "model": model,
         "stream": False,
-        "options": {"temperature": 0, "num_ctx": 8192},
+        "options": {"temperature": 0, "num_ctx": 8192, "num_predict": MAX_OUTPUT_TOKENS},
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
     }
     if json_mode:
@@ -63,6 +65,7 @@ def _openai_compatible(
     body = {
         "model": model,
         "temperature": 0,
+        "max_tokens": MAX_OUTPUT_TOKENS,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
     }
     if json_mode:

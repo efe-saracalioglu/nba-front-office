@@ -10,7 +10,7 @@ from mcp import Client
 
 from agents import tracing
 from agents.llm import LLM, Call, cost_report
-from agents.providers import OLLAMA_URL, ollama_request
+from agents.providers import MAX_OUTPUT_TOKENS, OLLAMA_URL, ollama_request
 from agents.toolbox import ToolBox, ToolCallError
 
 MAX_STEPS = 24
@@ -37,7 +37,7 @@ def _ollama_chat(model: str, messages: list[dict], tools: list[dict]) -> dict:
         "stream": False,
         "messages": messages,
         "tools": tools,
-        "options": {"temperature": 0, "num_ctx": 32768},
+        "options": {"temperature": 0, "num_ctx": 32768, "num_predict": MAX_OUTPUT_TOKENS},
     }
     r = httpx.post(f"{OLLAMA_URL}/api/chat", json=body, timeout=300, headers=headers)
     r.raise_for_status()

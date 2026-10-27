@@ -1,0 +1,31 @@
+{
+  "config": "full",
+  "questions": 84,
+  "accuracy": 0.857,
+  "routed_to_stats": 0.75,
+  "sql_first_try_ok": 0.726,
+  "avg_sql_attempts": 0.79,
+  "errors": 3,
+  "avg_seconds": 10.9,
+  "avg_tokens": 3487,
+  "total_usd_list_price": 0.0578,
+  "by_template": {
+    "best_net_rating": "4/4",
+    "clutch": "1/1",
+    "contract_salary": "3/10",
+    "count_25ppg": "4/4",
+    "games_over_40": "9/9",
+    "injury_status": "8/8",
+    "leader": "9/9",
+    "payroll": "8/8",
+    "pick_owner": "7/10",
+    "player_average": "9/9",
+    "team_wins": "8/8",
+    "top_projection": "2/4"
+  },
+  "routes": {
+    "stats_question": 63,
+    "player_question": 18,
+    "trade_search": 3
+  }
+}

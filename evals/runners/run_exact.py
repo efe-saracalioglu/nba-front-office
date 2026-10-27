@@ -40,8 +40,7 @@ def answer_with(config_name: str, question: str, item_id: str) -> dict:
                   "sql_first_try_ok": bool(attempts and attempts[0]["ok"])}  # fmt: skip
 
 
-def run_one(item: dict, config_name: str) -> dict:
-    out = answer_with(config_name, item["question"], item["id"])
+def scored(item: dict, out: dict) -> dict:
     ok, why = check(item, out.get("answer"))
     return out | {
         "correct": ok,
@@ -49,6 +48,21 @@ def run_one(item: dict, config_name: str) -> dict:
         "verdict": "correct" if ok else f"wrong ({why})",
         "template": item["template"],
     }
+
+
+def run_one(item: dict, config_name: str) -> dict:
+    return scored(item, answer_with(config_name, item["question"], item["id"]))
+
+
+def rescore(config_name: str, items: list[dict]) -> list[dict]:
+    path = RESULTS / "exact" / f"{config_name}.jsonl"
+    by_id = {i["id"]: i for i in items}
+    rows = [scored(by_id[r["id"]], r) for r in load_jsonl(path) if r["id"] in by_id]
+    path.write_text(
+        "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in rows),
+        encoding="utf-8",
+    )
+    return rows
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -83,13 +97,20 @@ def main() -> None:
         action="store_true",
         help="only questions answerable on the sample warehouse",
     )
+    parser.add_argument(
+        "--rescore", action="store_true", help="re-score saved answers without calling any model"
+    )
     args = parser.parse_args()
     logging.disable(logging.INFO)
     items = load_jsonl(ITEMS)
     if args.sample_only:
         items = [i for i in items if i["sample_ok"]]
     items = items[: args.limit]
-    rows = run_suite("exact", args.config, items, run_one)
+    rows = (
+        rescore(args.config, items)
+        if args.rescore
+        else run_suite("exact", args.config, items, run_one)
+    )
     summary = {"config": args.config, **summarize(rows)}
     out = RESULTS / "exact" / f"{args.config}_summary.json"
     out.write_text(json.dumps(summary, indent=2), encoding="utf-8")
